@@ -13,6 +13,7 @@ namespace Airbnb.Domain.DataTransferObjects.Property
         public string? Country { get; set; }
         public string? Location { get; set; }
         public string? Region { get; set; }
+        public float Rate { get; set; }
         public List<string>?RoomServices { get; set; } = new List<string>();
         public List<string>? Categories { get; set; }= new List<string>();
     }

@@ -53,6 +53,8 @@ namespace Airbnb.APIs.Extensions
             Services.AddScoped<IAuthService, AuthService>();
             Services.AddScoped<IUserService, UserService>();
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            Services.AddScoped<IReviewService, ReviewServices>();
+            Services.AddScoped<IReviewRepository, ReviewRepository>();
 
             Services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             Services.AddTransient<IMailService, MailService>();

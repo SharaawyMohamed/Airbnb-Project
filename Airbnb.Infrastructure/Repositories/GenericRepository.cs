@@ -1,15 +1,11 @@
 ﻿using Airbnb.Domain;
+using Airbnb.Domain.Entities;
 using Airbnb.Domain.Interfaces.Interface;
 using Airbnb.Domain.Interfaces.Repositories;
 using Airbnb.Infrastructure.Data;
 using Airbnb.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Airbnb.Infrastructure.Repositories
 {

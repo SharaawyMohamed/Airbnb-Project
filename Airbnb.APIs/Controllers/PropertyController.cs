@@ -1,14 +1,17 @@
 ﻿using System.Net;
 using System.Security.Claims;
-using Airbnb.Application.Utility;
 using Airbnb.Domain;
 using Airbnb.Domain.DataTransferObjects.Property;
-using Airbnb.Domain.Identity;
+using Airbnb.Domain.Entities;
+using Airbnb.Domain.Interfaces.Interface;
+using Airbnb.Domain.Interfaces.Repositories;
 using Airbnb.Domain.Interfaces.Services;
+using Airbnb.Infrastructure.Specifications;
+using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Airbnb.APIs.Controllers
 {
@@ -16,20 +19,25 @@ namespace Airbnb.APIs.Controllers
     {
         private readonly IPropertyService _propertyService;
         private readonly IValidator<PropertyRequest> _PropertyRequest;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public PropertyController(IPropertyService propertyService, IValidator<PropertyRequest> propertyRequest)
+        public PropertyController(IPropertyService propertyService, IValidator<PropertyRequest> propertyRequest, IUnitOfWork unitOfWork, IMapper mapper)
 
         {
             _propertyService = propertyService;
             _PropertyRequest = propertyRequest;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("GetProperties")]
-        public async Task<ActionResult<Responses>> GetAllProperties()
+        public async Task<ActionResult<Responses>> GetAllProperties([FromQuery]ProductSpecParameters param)
         {
-            var properties = await _propertyService.GetAllPropertiesAsync();
-            return Ok(properties);
+            var spec=new PropertyWithSpec(param);
+            var specs = await _unitOfWork.Repository<Property, string>().GetAllWithSpecAsync(spec);
+            return Ok(_mapper.Map<IEnumerable<PropertyResponse>>(specs));
         }
 
         [Authorize(Roles = "Owner")]
@@ -65,12 +73,10 @@ namespace Airbnb.APIs.Controllers
         [HttpPut("UpdateProperty")]
         // TODO: un Completed Implementation for this method
         // TODO: the is some Errors in Authorization
-        public async Task<ActionResult<Responses>> UpdateProperty(string? propertyId, UpdatePropertyDto propertyDTO)
+        public async Task<ActionResult<Responses>> UpdateProperty([FromForm]UpdatePropertyDto propertyDTO)
         {
-            //  var validate = await _PropertyRequest.ValidateAsync(propertyDTO);
-            // if (!validate.IsValid) return await Responses.FailurResponse(validate.Errors);
-            if (propertyId is null) return await Responses.FailurResponse(HttpStatusCode.BadRequest);
-            return Ok(await _propertyService.UpdatePropertyAsync(propertyId, propertyDTO));
+            if (propertyDTO.PropertyId is null) return await Responses.FailurResponse("Invalid nullable Id",HttpStatusCode.BadRequest);
+            return Ok(await _propertyService.UpdatePropertyAsync(propertyDTO));
         }
 
     }

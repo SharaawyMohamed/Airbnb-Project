@@ -1,18 +1,15 @@
-﻿
-using Airbnb.Application.Resolvers;
+﻿using Airbnb.Application.Resolvers;
 using Airbnb.Domain.DataTransferObjects;
 using Airbnb.Domain.DataTransferObjects.Booking;
 using Airbnb.Domain.DataTransferObjects.Category;
 using Airbnb.Domain.DataTransferObjects.Country;
 using Airbnb.Domain.DataTransferObjects.Image;
 using Airbnb.Domain.DataTransferObjects.Location;
-using Airbnb.Domain.DataTransferObjects.Property;
 using Airbnb.Domain.DataTransferObjects.Region;
 using Airbnb.Domain.DataTransferObjects.User;
 using Airbnb.Domain.Entities;
 using Airbnb.Domain.Identity;
 using AutoMapper;
-using Org.BouncyCastle.Asn1;
 namespace Airbnb.Application.MappingProfiler
 {
     public class MappingProfiles : Profile
@@ -35,11 +32,11 @@ namespace Airbnb.Application.MappingProfiler
             CreateMap<Location, LocationResponse>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
-            CreateMap<Region,RegionResponse>()
-                .ForMember(dest=>dest.Name,opt=>opt.MapFrom(src=>src.Name));
+            CreateMap<Region, RegionResponse>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
-            CreateMap<Country,CountryResponse>()
-                .ForMember(dest=>dest.Name,opt=>opt.MapFrom(src=>src.Name));
+            CreateMap<Country, CountryResponse>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
             CreateMap<AppUser, OwnerDto>()
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
@@ -49,7 +46,7 @@ namespace Airbnb.Application.MappingProfiler
             CreateMap<Category, CategoryResponse>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
-           
+
 
             CreateMap<RoomService, RoomServicesDto>()
                  .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Name));
@@ -60,13 +57,17 @@ namespace Airbnb.Application.MappingProfiler
                 .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate))
                 .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => src.PaymentMethod))
                 .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate));
-                
-            CreateMap<Image,ImageResponse>()
-                .ForMember(dest=>dest.Url, otp=>otp.MapFrom<ImagePropertyResolver>());
+
+            CreateMap<Image, ImageResponse>()
+               .ForMember(dest => dest.Url, otp => otp.MapFrom<ImagePropertyResolver>());
+
 
             CreateMap<Review, ReviewDto>()
-               .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Name))
-               .ForMember(dest => dest.Stars, opt => opt.MapFrom(src => src.Stars));
+               .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Name));
+
+            CreateMap<ReviewDto, Review>()
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Comment));
+
 
             CreateMap<Property, PropertyUserDto>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
@@ -76,12 +77,12 @@ namespace Airbnb.Application.MappingProfiler
                 .ForMember(dest => dest.PlaceType, opt => opt.MapFrom(src => src.PlaceType));
 
 
-            
+
 
             CreateMap<RegisterDTO, AppUser>()
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.MiddlName} {src.LastName}".Trim()))
             .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password));
 
-          }
+        }
     }
 }
