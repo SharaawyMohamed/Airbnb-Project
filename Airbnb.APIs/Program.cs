@@ -23,12 +23,14 @@ namespace Airbnb.APIs
             // Apply Pending Migrations on Database
             await ExtensionMethods.ApplyMigrations(app);
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            //Configure the HTTP request pipeline.
+           // if (app.Environment.IsDevelopment())
+           // {
+               
+           // }
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
             app.UseStaticFiles();
             app.UseHttpsRedirection();
 
