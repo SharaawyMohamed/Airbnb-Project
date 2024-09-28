@@ -9,12 +9,20 @@ namespace Airbnb.Infrastructure.Specifications
         public PropertyWithSpec(ProductSpecParameters param)
             : base(P =>
             (string.IsNullOrWhiteSpace(param.categoryName) || P.Categories.Any(c => c.Name == param.categoryName))
+
             && (!param.locationId.HasValue || P.LocationId == param.locationId)
+
+            && (!param.bookingDate.from.HasValue || P.Bookings.Any(x => x.EndDate < param.bookingDate.from))
+
+            && (!(param.bookingDate.from.HasValue && param.bookingDate.to.HasValue) ||
+            !P.Bookings.Any(x =>
+            (x.StartDate >= param.bookingDate.from && x.StartDate <= param.bookingDate.to) ||
+            (x.EndDate >= param.bookingDate.from && x.EndDate <= param.bookingDate.to)))
             )
         {
             if (!string.IsNullOrWhiteSpace(param.sort.ToString()))
             {
-                switch(param.sort)
+                switch (param.sort)
                 {
                     case Sort.NightPriceAsc:
                         AddOrderBy(x => x.NightPrice);
@@ -39,8 +47,8 @@ namespace Airbnb.Infrastructure.Specifications
             skip = skip > 0 ? skip : 0;
 
             int take = param.PageSize;
-            ApplyPagination(skip,take);
-           
+            ApplyPagination(skip, take);
+
         }
     }
 }

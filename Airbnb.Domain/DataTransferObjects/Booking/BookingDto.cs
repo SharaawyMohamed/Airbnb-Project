@@ -8,11 +8,10 @@ namespace Airbnb.Domain.DataTransferObjects.Booking
 {
     public class BookingDto
     {
-
-        public decimal TotalPrice { get; set; }
+        public string PropertyId { get;set; }
+        public string UserId { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public string PaymentMethod { get; set; } = string.Empty;
-        public DateTimeOffset PaymentDate { get; set; }
     }
 }

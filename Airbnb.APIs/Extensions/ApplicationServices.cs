@@ -54,7 +54,7 @@ namespace Airbnb.APIs.Extensions
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
             Services.AddScoped<IReviewService, ReviewServices>();
             Services.AddScoped<IReviewRepository, ReviewRepository>();
-
+            Services.AddMediatR(cgf=>cgf.RegisterServicesFromAssemblies(typeof(Program).Assembly));
             Services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             Services.AddTransient<IMailService, MailService>();
 

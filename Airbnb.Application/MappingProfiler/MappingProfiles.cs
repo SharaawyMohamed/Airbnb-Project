@@ -1,4 +1,5 @@
-﻿using Airbnb.Application.Resolvers;
+﻿using Airbnb.Application.Features.Bookings.Command;
+using Airbnb.Application.Resolvers;
 using Airbnb.Domain.DataTransferObjects;
 using Airbnb.Domain.DataTransferObjects.Booking;
 using Airbnb.Domain.DataTransferObjects.Category;
@@ -46,7 +47,11 @@ namespace Airbnb.Application.MappingProfiler
             CreateMap<Category, CategoryResponse>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
+            CreateMap<CreateBookingCommand, Booking>()
+              .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.BookingType))
+              .ForMember(dest => dest.TotalPrice, opt => opt.Ignore());
 
+              
 
             CreateMap<RoomService, RoomServicesDto>()
                  .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Name));

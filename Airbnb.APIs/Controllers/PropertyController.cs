@@ -31,7 +31,6 @@ namespace Airbnb.APIs.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet("GetProperties")]
         public async Task<ActionResult<Responses>> GetAllProperties([FromQuery]ProductSpecParameters param)
         {

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.VisualBasic;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Airbnb.Infrastructure.Specifications
 {
@@ -16,15 +12,20 @@ namespace Airbnb.Infrastructure.Specifications
         NightPriceDesc,
         Name
     }
+    public class DateRange
+    {
+        public DateTime? from { get; set; }
+        public DateTime? to { get; set; }
+
+
+    }
     public class ProductSpecParameters
     {
         public Sort? sort { get; set; }
         public string? categoryName { get; set; }
         public int? locationId { get; set; }
-
+        public DateRange? bookingDate { get; set; }
         public int pageIndex { get; set; }
-
-
         private int pageSize = 20;
         public int PageSize
         {
