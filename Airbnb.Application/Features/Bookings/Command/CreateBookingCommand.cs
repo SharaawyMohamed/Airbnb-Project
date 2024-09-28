@@ -22,7 +22,7 @@ namespace Airbnb.Application.Features.Bookings.Command
         public DateTimeOffset EndDate { get; set; }
         public string PaymentMethod { get; set; } = string.Empty;
     }
-    internal class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, Responses>
+    public class CreateBookingCommandHandler : IRequestHandler<CreateBookingCommand, Responses>
     {
         private readonly IValidator<CreateBookingCommand> _validator;
         private readonly IHttpContextAccessor _contextAccessor;
@@ -77,7 +77,7 @@ namespace Airbnb.Application.Features.Bookings.Command
             {
                 await _unitOfWork.Repository<booking, int>().AddAsync(mapped);
                 await _unitOfWork.CompleteAsync();
-                return await Responses.SuccessResponse("this property already booked in this date range!");
+                return await Responses.SuccessResponse($"Property with id {property.Id} has been booked successfully!");
             }
             catch (Exception ex)
             {
@@ -85,7 +85,7 @@ namespace Airbnb.Application.Features.Bookings.Command
             }
 
         }
-        public async Task<AppUser>? GetCurrentUserAsync()
+        internal async Task<AppUser>? GetCurrentUserAsync()
         {
             var userClaims = _contextAccessor.HttpContext?.User;
 

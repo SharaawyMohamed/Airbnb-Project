@@ -14,17 +14,15 @@ namespace Airbnb.Infrastructure.Specifications
     }
     public class DateRange
     {
-        public DateTime? from { get; set; }
-        public DateTime? to { get; set; }
-
-
+        
     }
     public class ProductSpecParameters
     {
         public Sort? sort { get; set; }
         public string? categoryName { get; set; }
         public int? locationId { get; set; }
-        public DateRange? bookingDate { get; set; }
+        public DateTime? startDate { get; set; }
+        public DateTime? ednDate { get; set; }
         public int pageIndex { get; set; }
         private int pageSize = 20;
         public int PageSize

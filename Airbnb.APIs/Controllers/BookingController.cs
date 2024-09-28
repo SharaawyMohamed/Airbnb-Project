@@ -1,6 +1,6 @@
 ﻿using Airbnb.Application.Features.Bookings.Command;
+using Airbnb.Application.Features.Bookings.Query;
 using Airbnb.Domain;
-using Airbnb.Domain.DataTransferObjects.Booking;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,5 +20,13 @@ namespace Airbnb.APIs.Controllers
         {
             return Ok(await _mediator.Send(command));
         }
+
+        [HttpGet("GetBookings/{userId}")]
+        public async Task<ActionResult<Responses>> GetUserBookings(string userId)
+        {
+            var query=new GetUserBookingsQuery(userId);
+            return Ok(await _mediator.Send(query));
+        }
+
     }
 }

@@ -1,5 +1,8 @@
-﻿using Airbnb.APIs.MiddelWairs;
+﻿using Airbnb.APIs.Controllers;
+using Airbnb.APIs.MiddelWairs;
 using Airbnb.APIs.Validators;
+using Airbnb.Application.Features.Booking.Command;
+using Airbnb.Application.Features.Bookings.Command;
 using Airbnb.Application.Resolvers;
 using Airbnb.Application.Services;
 using Airbnb.Application.Settings;
@@ -11,6 +14,7 @@ using Airbnb.Infrastructure.Repositories;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 namespace Airbnb.APIs.Extensions
 {
@@ -40,7 +44,7 @@ namespace Airbnb.APIs.Extensions
                  .AddNewtonsoftJson(options =>
                  {
                      options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                     options.SerializerSettings.Formatting = Formatting.Indented; 
+                     options.SerializerSettings.Formatting = Formatting.Indented;
                  });
 
             // AutoMapper Configuration
@@ -54,15 +58,19 @@ namespace Airbnb.APIs.Extensions
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
             Services.AddScoped<IReviewService, ReviewServices>();
             Services.AddScoped<IReviewRepository, ReviewRepository>();
-            Services.AddMediatR(cgf=>cgf.RegisterServicesFromAssemblies(typeof(Program).Assembly));
             Services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             Services.AddTransient<IMailService, MailService>();
 
+            // Register all MediatR handlers from multiple assemblies
+            Services.AddMediatR(cgf =>
+            cgf.RegisterServicesFromAssemblies(typeof(CreateBookingCommandHandler).Assembly)
+            );
+
             Services.AddFluentValidation(fv =>
             {
-                fv.RegisterValidatorsFromAssembly(typeof(CreateAccountValidator).Assembly);
+                fv.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
             });
-           
+
 
             return Services;
         }

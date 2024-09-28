@@ -12,35 +12,33 @@ namespace Airbnb.Infrastructure.Specifications
 
             && (!param.locationId.HasValue || P.LocationId == param.locationId)
 
-            && (!param.bookingDate.from.HasValue || P.Bookings.Any(x => x.EndDate < param.bookingDate.from))
+            && (!param.startDate.HasValue || P.Bookings.Any(x => x.EndDate < param.startDate))
 
-            && (!(param.bookingDate.from.HasValue && param.bookingDate.to.HasValue) ||
+            && (!(param.startDate.HasValue && param.ednDate.HasValue) ||
             !P.Bookings.Any(x =>
-            (x.StartDate >= param.bookingDate.from && x.StartDate <= param.bookingDate.to) ||
-            (x.EndDate >= param.bookingDate.from && x.EndDate <= param.bookingDate.to)))
+            (x.StartDate >= param.startDate && x.StartDate <= param.ednDate) ||
+            (x.EndDate >= param.startDate && x.EndDate <= param.ednDate)))
             )
         {
-            if (!string.IsNullOrWhiteSpace(param.sort.ToString()))
-            {
-                switch (param.sort)
-                {
-                    case Sort.NightPriceAsc:
-                        AddOrderBy(x => x.NightPrice);
-                        break;
-                    case Sort.NightPriceDesc:
-                        AddOrderByDescending(x => x.NightPrice);
-                        break;
-                    case Sort.RateAsc:
-                        AddOrderBy(x => x.Rate);
-                        break;
-                    case Sort.RateDesc:
-                        AddOrderByDescending(x => x.Rate);
-                        break;
-                    default:
-                        AddOrderBy(x => x.Name);
-                        break;
 
-                }
+            switch (param.sort)
+            {
+                case Sort.NightPriceAsc:
+                    AddOrderBy(x => x.NightPrice);
+                    break;
+                case Sort.NightPriceDesc:
+                    AddOrderByDescending(x => x.NightPrice);
+                    break;
+                case Sort.RateAsc:
+                    AddOrderBy(x => x.Rate);
+                    break;
+                case Sort.RateDesc:
+                    AddOrderByDescending(x => x.Rate);
+                    break;
+                default:
+                    AddOrderBy(x => x.Name);
+                    break;
+
             }
 
             int skip = (param.pageIndex - 1) * (param.PageSize);

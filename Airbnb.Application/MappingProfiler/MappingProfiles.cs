@@ -1,4 +1,5 @@
 ﻿using Airbnb.Application.Features.Bookings.Command;
+using Airbnb.Application.Features.Bookings.Query;
 using Airbnb.Application.Resolvers;
 using Airbnb.Domain.DataTransferObjects;
 using Airbnb.Domain.DataTransferObjects.Booking;
@@ -82,7 +83,7 @@ namespace Airbnb.Application.MappingProfiler
                 .ForMember(dest => dest.PlaceType, opt => opt.MapFrom(src => src.PlaceType));
 
 
-
+            CreateMap<Booking, GetUserBookingsQueryDto>();
 
             CreateMap<RegisterDTO, AppUser>()
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.MiddlName} {src.LastName}".Trim()))
