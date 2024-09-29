@@ -1,4 +1,4 @@
-﻿using Airbnb.Application.Features.Bookings.Command;
+﻿using Airbnb.Application.Features.Bookings.Command.CreateBooking;
 using Airbnb.Application.Features.Bookings.Query;
 using Airbnb.Application.Resolvers;
 using Airbnb.Domain.DataTransferObjects;

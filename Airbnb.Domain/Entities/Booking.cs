@@ -9,6 +9,7 @@ namespace Airbnb.Domain.Entities
 		public DateTimeOffset EndDate { get; set; }
 		public string PaymentMethod { get; set; } = string.Empty;
 		public DateTimeOffset PaymentDate { get; set; }
+		public string PaymentStatus { get; set; }
 
         [ForeignKey("Property")]
         public string PropertyId { get; set; }

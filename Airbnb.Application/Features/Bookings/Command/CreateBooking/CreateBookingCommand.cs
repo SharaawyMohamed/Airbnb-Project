@@ -1,4 +1,5 @@
-﻿using Airbnb.Domain;
+﻿using Airbnb.Application.Utility;
+using Airbnb.Domain;
 using Airbnb.Domain.Entities;
 using Airbnb.Domain.Identity;
 using Airbnb.Domain.Interfaces.Repositories;
@@ -11,7 +12,7 @@ using System.Net;
 using System.Security.Claims;
 using booking = Airbnb.Domain.Entities.Booking;
 
-namespace Airbnb.Application.Features.Bookings.Command
+namespace Airbnb.Application.Features.Bookings.Command.CreateBooking
 {
     public record CreateBookingCommand : IRequest<Responses>
     {
@@ -46,7 +47,7 @@ namespace Airbnb.Application.Features.Bookings.Command
                 return await Responses.FailurResponse(validation.Errors.ToList());
             }
 
-            var user = await GetCurrentUserAsync();
+            var user = await GetUser.GetCurrentUserAsync(_contextAccessor,_userManager);
             if (user == null || user.Id != request.UserId)
             {
                 return await Responses.FailurResponse("UnAuthorized user!", HttpStatusCode.Unauthorized);
@@ -83,25 +84,6 @@ namespace Airbnb.Application.Features.Bookings.Command
             {
                 return await Responses.FailurResponse(ex.Message, HttpStatusCode.InternalServerError);
             }
-
-        }
-        internal async Task<AppUser>? GetCurrentUserAsync()
-        {
-            var userClaims = _contextAccessor.HttpContext?.User;
-
-            if (userClaims == null || !userClaims.Identity.IsAuthenticated)
-            {
-                return null;
-            }
-
-            var userEmail = userClaims.FindFirstValue(ClaimTypes.Email);
-
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return null;
-            }
-
-            return await _userManager.FindByEmailAsync(userEmail);
 
         }
     }

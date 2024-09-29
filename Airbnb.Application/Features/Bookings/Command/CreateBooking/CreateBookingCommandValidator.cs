@@ -1,14 +1,13 @@
-﻿using Airbnb.Application.Features.Bookings.Command;
-using FluentValidation;
+﻿using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Airbnb.Application.Features.Booking.Command
+namespace Airbnb.Application.Features.Bookings.Command.CreateBooking
 {
-    public class CreateBookingCommandValidator:AbstractValidator<CreateBookingCommand>
+    public class CreateBookingCommandValidator : AbstractValidator<CreateBookingCommand>
     {
         public CreateBookingCommandValidator()
         {

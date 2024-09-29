@@ -1,8 +1,5 @@
-﻿using Airbnb.APIs.Controllers;
-using Airbnb.APIs.MiddelWairs;
-using Airbnb.APIs.Validators;
-using Airbnb.Application.Features.Booking.Command;
-using Airbnb.Application.Features.Bookings.Command;
+﻿using Airbnb.APIs.MiddelWairs;
+using Airbnb.Application.Features.Bookings.Command.CreateBooking;
 using Airbnb.Application.Resolvers;
 using Airbnb.Application.Services;
 using Airbnb.Application.Settings;

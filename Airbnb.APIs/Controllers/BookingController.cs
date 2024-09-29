@@ -1,4 +1,5 @@
-﻿using Airbnb.Application.Features.Bookings.Command;
+﻿using Airbnb.Application.Features.Bookings.Command.BookingCancelation;
+using Airbnb.Application.Features.Bookings.Command.CreateBooking;
 using Airbnb.Application.Features.Bookings.Query;
 using Airbnb.Domain;
 using MediatR;
@@ -27,6 +28,15 @@ namespace Airbnb.APIs.Controllers
             var query=new GetUserBookingsQuery(userId);
             return Ok(await _mediator.Send(query));
         }
+
+        //TODO: InComplete Payment Method
+        [HttpDelete("DeleteBooking/{bookingId}")]
+        public async Task<ActionResult<Responses>> BookingCancelation(int bookingId)
+        {
+            var command = new BookingCancelationCommand(bookingId);
+            return Ok(await _mediator.Send(command));
+        }
+
 
     }
 }

@@ -34,7 +34,7 @@ namespace Airbnb.Application.Services
         }
         public async Task<Responses> CreatePropertyAsync(PropertyRequest propertyDTO)
         {
-            var owner = await GetCurrentUserAsync();
+            var owner = await GetUser.GetCurrentUserAsync(_contextAccessor,_userManager);
             var user = await _userManager.FindByEmailAsync(propertyDTO.OwnereEmail);
             if (owner == null || user == null || user.Email != owner.Email)
             {
@@ -144,7 +144,7 @@ namespace Airbnb.Application.Services
         }
         public async Task<Responses> DeletePropertyAsync(string propertyId)
         {
-            var user = await GetCurrentUserAsync();
+            var user = await GetUser.GetCurrentUserAsync(_contextAccessor, _userManager);
             if (user == null)
             {
                 return await Responses.FailurResponse("Unauthenticated request!", HttpStatusCode.Unauthorized);
@@ -190,7 +190,7 @@ namespace Airbnb.Application.Services
         }
         public async Task<Responses> GetPropertyByIdAsync(string propertyId)
         {
-            var user = await GetCurrentUserAsync();
+            var user = await GetUser.GetCurrentUserAsync(_contextAccessor, _userManager);
             if (user == null)
             {
                 return await Responses.FailurResponse("Unauthenticated request!", HttpStatusCode.Unauthorized);
@@ -209,7 +209,7 @@ namespace Airbnb.Application.Services
         }
         public async Task<Responses> UpdatePropertyAsync(UpdatePropertyDto propertyDTO)
         {
-            var user = await GetCurrentUserAsync();
+            var user = await GetUser.GetCurrentUserAsync(_contextAccessor, _userManager);
             if (user == null)
             {
                 return await Responses.FailurResponse("Unauthenticated request!", HttpStatusCode.Unauthorized);
@@ -251,25 +251,27 @@ namespace Airbnb.Application.Services
 
         }
 
-        public async Task<AppUser>? GetCurrentUserAsync()
-        {
-            var userClaims = _contextAccessor.HttpContext?.User;
+        #region GetUser
+        //public async Task<AppUser>? GetCurrentUserAsync()
+        //{
+        //    var userClaims = _contextAccessor.HttpContext?.User;
 
-            if (userClaims == null || !userClaims.Identity.IsAuthenticated)
-            {
-                return null;
-            }
+        //    if (userClaims == null || !userClaims.Identity.IsAuthenticated)
+        //    {
+        //        return null;
+        //    }
 
-            var userEmail = userClaims.FindFirstValue(ClaimTypes.Email);
+        //    var userEmail = userClaims.FindFirstValue(ClaimTypes.Email);
 
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return null;
-            }
+        //    if (string.IsNullOrEmpty(userEmail))
+        //    {
+        //        return null;
+        //    }
 
-            return await _userManager.FindByEmailAsync(userEmail);
+        //    return await _userManager.FindByEmailAsync(userEmail);
 
-        }
+        //} 
+        #endregion
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using Airbnb.Domain;
+﻿using Airbnb.Application.Utility;
+using Airbnb.Domain;
 using Airbnb.Domain.Identity;
 using Airbnb.Domain.Interfaces.Repositories;
 using Airbnb.Infrastructure.Specifications;
@@ -37,7 +38,7 @@ namespace Airbnb.Application.Features.Bookings.Query
 
         public async Task<Responses> Handle(GetUserBookingsQuery request, CancellationToken cancellationToken)
         {
-            var user = await GetCurrentUserAsync();
+            var user = await GetUser.GetCurrentUserAsync(_contextAccessor,_userManager);
             if (user == null || user.Id != request.userId)
             {
                 return await Responses.FailurResponse("UnAuthorized user!", HttpStatusCode.Unauthorized);
@@ -54,25 +55,6 @@ namespace Airbnb.Application.Features.Bookings.Query
                 return await Responses.FailurResponse($"Internal server error\n {ex.Message}!",HttpStatusCode.InternalServerError);
             }
 
-
-        }
-        internal async Task<AppUser>? GetCurrentUserAsync()
-        {
-            var userClaims = _contextAccessor.HttpContext?.User;
-
-            if (userClaims == null || !userClaims.Identity.IsAuthenticated)
-            {
-                return null;
-            }
-
-            var userEmail = userClaims.FindFirstValue(ClaimTypes.Email);
-
-            if (string.IsNullOrEmpty(userEmail))
-            {
-                return null;
-            }
-
-            return await _userManager.FindByEmailAsync(userEmail);
 
         }
     }
