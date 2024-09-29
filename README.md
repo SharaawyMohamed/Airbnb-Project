@@ -18,7 +18,7 @@ This project is a backend implementation for an Airbnb clone, developed using .N
 - **Authentication**: JWT (JSON Web Tokens)
 - **Payment Gateway**: Stripe API
 - **Database**: SQL Server
-- **Architecture**: Onion Architecture
+- **Architecture**: Clean Architecture
 - **Design Patterns**: Repository, Unit of Work, Dependency Injection
 - **Caching**: Implemented to optimize performance
 
