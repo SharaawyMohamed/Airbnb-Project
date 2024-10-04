@@ -9,10 +9,12 @@ using Airbnb.Domain.Interfaces.Services;
 using Airbnb.Infrastructure.Data;
 using Airbnb.Infrastructure.Repositories;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 namespace Airbnb.APIs.Extensions
 {
     public static class ApplicationServices
@@ -57,7 +59,12 @@ namespace Airbnb.APIs.Extensions
             Services.AddScoped<IReviewRepository, ReviewRepository>();
             Services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             Services.AddTransient<IMailService, MailService>();
-
+            // Redis Registration
+            Services.AddSingleton<IConnectionMultiplexer>(options=>
+            {
+                var connection = Configuration.GetConnectionString("RedisConnection");
+                return ConnectionMultiplexer.Connect(connection);
+            });
             // Register all MediatR handlers from multiple assemblies
             Services.AddMediatR(cgf =>
             cgf.RegisterServicesFromAssemblies(typeof(CreateBookingCommandHandler).Assembly)
