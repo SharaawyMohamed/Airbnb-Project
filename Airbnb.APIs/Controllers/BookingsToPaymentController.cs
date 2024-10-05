@@ -1,5 +1,6 @@
 ﻿using Airbnb.Application.Features.BookingToPayment.Command;
 using Airbnb.Application.Features.BookingToPayment.Query;
+using Airbnb.Application.Features.BookingToPayments.Command;
 using Airbnb.Domain;
 using Airbnb.Domain.Entities;
 using MediatR;

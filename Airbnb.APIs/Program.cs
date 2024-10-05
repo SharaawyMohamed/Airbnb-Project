@@ -44,7 +44,7 @@ namespace Airbnb.APIs
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseAuthorization(); 
 
             app.MapHub<ChatHub>("chat-hub");
 

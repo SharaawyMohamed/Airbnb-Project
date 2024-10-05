@@ -10,11 +10,6 @@ namespace Airbnb.Application.Features.BookingToPayment.Entities
     public class CustomerBookings
     {
         public string Id { get; set; }
-        public List<BookingToPayment> Bookings { get; set; }
-        public CustomerBookings(string id)
-        {
-            Id = id;
-        }
-
+        public BookingToPayment Booking { get; set; }
     }
 }

@@ -22,7 +22,7 @@ namespace Airbnb.Application.Features.BookingToPayment.Command
         }
         public async Task<Responses> Handle(DeleteCustomerBookingsCommand request, CancellationToken cancellationToken)
         {
-            var IsDeleted = await _database.StringGetDeleteAsync(request.Id);
+            var IsDeleted = await _database.KeyDeleteAsync(request.Id);
             return IsDeleted == true ?
                 await Responses.SuccessResponse("Customer bookings has been deleted successfully.") :
                 await Responses.FailurResponse("Internal server error.",HttpStatusCode.InternalServerError);

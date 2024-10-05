@@ -1,5 +1,7 @@
 ﻿using Airbnb.Application.Features.BookingToPayment.Entities;
+using Airbnb.Application.Features.BookingToPayments.Command;
 using Airbnb.Domain;
+using Mapster;
 using MediatR;
 using StackExchange.Redis;
 using System.Net;
@@ -28,9 +30,17 @@ namespace Airbnb.Application.Features.BookingToPayment.Query
         public async Task<Responses> Handle(GetBookingByIdToPaymentQuery request, CancellationToken cancellationToken)
         {
             var bookings = await _database.StringGetAsync(request.Id);
-            return bookings.IsNull ?
-                await Responses.FailurResponse(new CustomerBookings(request.Id) ,HttpStatusCode.NotFound) :
-                await Responses.SuccessResponse(JsonSerializer.Deserialize<CustomerBookings>(bookings));
+
+            if (bookings.IsNull)
+            {
+                return await Responses.FailurResponse(new CreateCustomerBookingsCommand(request.Id), HttpStatusCode.NotFound);
+            }
+            else
+            {
+                var response = JsonSerializer.Deserialize<CustomerBookings>(bookings);
+                //var maped = response.Adapt<CreateCustomerBookingsCommand>();
+                return await Responses.SuccessResponse(response);
+            }
         }
     }
 }
