@@ -48,6 +48,7 @@ namespace Airbnb.APIs.Extensions
 
             // AutoMapper Configuration
             Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             Services.AddTransient<ExceptionMiddleWare>();
             Services.AddMemoryCache();
             Services.AddScoped<UserResolver>();
