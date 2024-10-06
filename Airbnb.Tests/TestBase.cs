@@ -1,4 +1,5 @@
 ﻿using Airbnb.Application.Services;
+using Airbnb.Domain.DataTransferObjects.User;
 using Airbnb.Domain.Identity;
 using Airbnb.Domain.Interfaces.Repositories;
 using Airbnb.Domain.Interfaces.Services;
@@ -7,6 +8,7 @@ using Airbnb.Infrastructure.Repositories;
 using Mapster;
 using MapsterMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using System.Reflection;
 using System.Security.Claims;
@@ -24,17 +27,19 @@ namespace Airbnb.Tests
 {
     public class TestBase : IDisposable
     {
+        private readonly string _dbName;
         protected readonly DbContextOptions<AirbnbDbContext> _dbContextOptions;
         protected readonly ServiceProvider _serviceProvider;
-        //private readonly IServiceScope _serviceScope;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly WebApplicationBuilder _builder;
 
         public TestBase()
         {
-            // Create New Dat 
+            // Create New Dat
+
             _dbContextOptions = new DbContextOptionsBuilder<AirbnbDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+            .UseInMemoryDatabase(_dbName = Guid.NewGuid().ToString()).Options;
+
             var services = new ServiceCollection();
 
             var mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
@@ -47,7 +52,6 @@ namespace Airbnb.Tests
             AddServices(services, mockWebHostEnvironment, _builder.Configuration, mockMediator);
 
             _serviceProvider = services.BuildServiceProvider();
-          //  _serviceScope = _serviceProvider.CreateScope();
             _scopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
 
             InitializeDatabase().GetAwaiter();
@@ -64,7 +68,10 @@ namespace Airbnb.Tests
             context.SetupGet(x => x.HttpContext)
                             .Returns(new DefaultHttpContext());
 
-            services.AddDbContext<AirbnbDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+            services.AddDbContext<AirbnbDbContext>(options =>
+            {
+                options.UseInMemoryDatabase(_dbName);
+            });
 
             // what do?
             services.AddLogging(builder =>
@@ -77,16 +84,39 @@ namespace Airbnb.Tests
             config.Scan(Assembly.GetAssembly(new Application.Mapester.BookingMap().GetType())!);
             services.AddSingleton(config);
             // services.AddScoped<IMapper, ServiceMapper>(); why this is used in ICPC Test Base
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IReviewService, ReviewServices>();
-            services.AddTransient<IReviewRepository, ReviewRepository>();
-            services.AddTransient<IMailService, MailService>();
-            services.AddTransient<IPropertyService, PropertyService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IReviewService, ReviewServices>();
+            services.AddScoped<IReviewRepository, ReviewRepository>();
+            services.AddScoped<IMailService, MailService>();
+            services.AddScoped<IPropertyService, PropertyService>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddMemoryCache();
 
 
+        }
+        public Mock<SignInManager<AppUser>> GetMockSignInManager()
+        {
+            var mockUserStore = Mock.Of<IUserStore<AppUser>>();
+            var userManagerMock = new Mock<UserManager<AppUser>>(mockUserStore, null, null, null, null, null, null, null, null);
+
+            var contextAccessorMock = new Mock<IHttpContextAccessor>();
+            var userPrincipalFactoryMock = new Mock<IUserClaimsPrincipalFactory<AppUser>>();
+            var optionsMock = new Mock<IOptions<IdentityOptions>>();
+            var loggerMock = new Mock<ILogger<SignInManager<AppUser>>>();
+            var schemesMock = new Mock<IAuthenticationSchemeProvider>();
+            var confirmationMock = new Mock<IUserConfirmation<AppUser>>();
+
+            var MockSignInManager = new Mock<SignInManager<AppUser>>(
+                userManagerMock.Object,
+                contextAccessorMock.Object,
+                userPrincipalFactoryMock.Object,
+                optionsMock.Object,
+                loggerMock.Object,
+                schemesMock.Object,
+                confirmationMock.Object
+                );
+            return MockSignInManager;
         }
         public Mock<IHttpContextAccessor> GetMockHttpContextAccessor(string userId)
         {
@@ -132,11 +162,12 @@ namespace Airbnb.Tests
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
                 await context.Database.EnsureCreatedAsync();
-
-                await roleManager.CreateAsync(new IdentityRole("Admin"));
-                await roleManager.CreateAsync(new IdentityRole("Owner"));
-                await roleManager.CreateAsync(new IdentityRole("Customer"));
+                var res = await roleManager.CreateAsync(new IdentityRole(Role.Customer.ToString()) { NormalizedName = Role.Customer.ToString().ToUpper() });
+                await roleManager.CreateAsync(new IdentityRole(Role.Owner.ToString()) { NormalizedName = Role.Owner.ToString().ToUpper() });
+                await roleManager.CreateAsync(new IdentityRole("Admin") { NormalizedName = "Admin".ToUpper() });
+                var data = await roleManager.Roles.ToListAsync();
             }
         }
     }
+
 }
