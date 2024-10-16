@@ -104,12 +104,6 @@ namespace Airbnb.Infrastructure.Data
 
             builder.Entity<Booking>(B =>
             {
-                B.Property(bs => bs.PaymentStatus)
-                .HasConversion(b => b.ToString(), b => (PaymentStatus)Enum.Parse(typeof(PaymentStatus), b));
-
-                B.Property(bm => bm.PaymentMethod)
-                .HasConversion(b => b.ToString(), b => (PaymentMethod)Enum.Parse(typeof(PaymentMethod), b));
-
                 B.Property(b => b.TotalPrice)
                 .HasColumnType("decimal(18,4)");
             });

@@ -24,6 +24,7 @@ namespace Airbnb.APIs
 
             builder.Services.AddSignalR();
             var app = builder.Build();
+
             // Apply Pending Migrations on Database
             await ExtensionMethods.ApplyMigrations(app);
 
@@ -41,6 +42,7 @@ namespace Airbnb.APIs
                            await context.Clients.All.ReceiveMessage(message);
                            return Results.NoContent();
                        });
+
             app.UseHttpsRedirection();
 
             app.UseAuthentication();

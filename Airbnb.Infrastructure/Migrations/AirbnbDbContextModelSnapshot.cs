@@ -46,6 +46,10 @@ namespace Airbnb.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("PaymentDate")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("PaymentIntentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

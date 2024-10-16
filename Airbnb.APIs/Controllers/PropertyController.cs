@@ -35,8 +35,10 @@ namespace Airbnb.APIs.Controllers
         public async Task<ActionResult<Responses>> GetAllProperties([FromQuery]ProductSpecParameters param)
         {
             var spec=new PropertyWithSpec(param);
-            var specs = await _unitOfWork.Repository<Property, string>().GetAllWithSpecAsync(spec);
-            return Ok(_mapper.Map<IEnumerable<PropertyResponse>>(specs));
+            var specs = await _unitOfWork.Repository<Property, string>().GetAllWithSpecAsync(spec)!;
+            var maped = _mapper.Map<IEnumerable<PropertyResponse>>(specs);
+
+			return Ok(maped);
         }
 
         [Authorize(Roles = "Owner")]

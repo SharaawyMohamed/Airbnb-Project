@@ -1,4 +1,5 @@
 ﻿using Airbnb.Domain.DataTransferObjects.Booking;
+using Airbnb.Domain.DataTransferObjects.Review;
 
 namespace Airbnb.Domain.DataTransferObjects.User
 {

@@ -9,10 +9,11 @@ namespace Airbnb.Domain.Entities
         public decimal TotalPrice { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty;
         public DateTimeOffset BookingDate { get; set; } = DateTimeOffset.Now;
         public DateTimeOffset PaymentDate { get; set; }
-        public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
+        public string PaymentStatus { get; set; } =string.Empty;
+        public string PaymentIntentId { get; set; }
 
         [ForeignKey("Property")]
         public string PropertyId { get; set; }
@@ -23,26 +24,20 @@ namespace Airbnb.Domain.Entities
         public string UserId { get; set; }
         public virtual AppUser User { get; set; }
 
-        public decimal GetTotalPrice()
-        {
-            var nights = (EndDate - StartDate).Days;
-            return Property.NightPrice * nights;
-        }
     }
-    public enum PaymentMethod
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	public enum PaymentMethod
     {
-        [EnumMember(Value = "Visa")]
         Visa,
-        [EnumMember(Value = "Cache")]
-        Cache
+        Cache,
+        Stripe
     }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum PaymentStatus
     {
-        [EnumMember(Value = "Pending")]
         Pending,
-        [EnumMember(Value = "PaymentReceived")]
         PaymentReceived,
-        [EnumMember(Value = "PaymentFailed")]
         PaymentFailed
     }
 }

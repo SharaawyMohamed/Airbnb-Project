@@ -7,17 +7,18 @@ using Airbnb.Domain;
 using Airbnb.Infrastructure.Specifications;
 using Airbnb.Domain.Interfaces.Repositories;
 using AutoMapper;
-using Airbnb.Domain.DataTransferObjects;
 using FluentValidation;
 using Airbnb.APIs.Validators;
 using System.Net;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Airbnb.Domain.Identity;
+using Airbnb.Domain.DataTransferObjects.Review;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Airbnb.APIs.Controllers
 {
-
+    [Authorize(Roles ="Customer")]
     public class ReviewController : APIBaseController
     {
         private readonly IReviewService _reviewService;
@@ -34,55 +35,44 @@ namespace Airbnb.APIs.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("GetAllReviews")]
-        public async Task<ActionResult<Responses>> GetAllReviews(string? propertyId, string? userId)
+        [Authorize(Roles ="Owner")]
+        [Authorize(Roles ="Admin")]
+        [HttpGet("GetPropertyReviews")]
+        public async Task<ActionResult<Responses>> GetPropertyReviews(string propertyId)
         {
-            return Ok(await _reviewService.GetAllReviewsAsync(propertyId, userId));
+            return Ok(await _reviewService.GetPropertyReviews(propertyId));
         }
 
+        [HttpGet("GetUserReviews")]
+        public async Task<ActionResult<Responses>> GetUserReviews(string userId)
+        {
+            return Ok(await _reviewService.GetUserReviews(userId));
+        }
 
-        [HttpGet("GetReviewDetails")]
+        [HttpGet("GetReviewById/{id}")]
         public async Task<ActionResult<Responses>> GetReview(int id)
         {
-            return Ok(await _reviewService.GetReviewAsync(id));
+            return Ok(await _reviewService.GetReviewById(id));
         }
 
-        [HttpPost("CreateReview")]
-        public async Task<ActionResult<Responses>> AddReview([FromBody] ReviewDto review)
-        {
-            var Email = User.FindFirstValue(ClaimTypes.Email);
-            var user = await _userManager.FindByEmailAsync(Email);
-            var validation = await _validator.ValidateAsync(review);
-            if (!validation.IsValid || user.Id!= review.UserId)
-            {
-                return BadRequest(await Responses.FailurResponse(ModelState));
-            }
-            return Ok(await _reviewService.AddReviewAsync(review));
-
-        }
-
-        [HttpPut("UpdateReview/{id}")]
-        public async Task<ActionResult<Responses>> UpdateReview(int id, [FromBody] ReviewDto review)
-        {
-            var Email = User.FindFirstValue(ClaimTypes.Email);
-            var user = await _userManager.FindByEmailAsync(Email);
-            var validation = await _validator.ValidateAsync(review);
-            if (review.UserId != user.Id)
-            {
-                return await Responses.FailurResponse("UnAuthenticated user!", HttpStatusCode.Unauthorized);
-            }
-            if (!validation.IsValid)
-            {
-                return await Responses.FailurResponse(validation.Errors,HttpStatusCode.BadRequest);
-            }
-            return Ok(await _reviewService.UpdateReviewAsync(user.Id,id,review));
-        }
-
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteReview/{id}")]
         public async Task<ActionResult<Responses>> DeleteReview(int id)
         {
             return Ok(await _reviewService.DeleteReviewAsync(id));
         }
+
+        [HttpPost("CreateReview")]
+        public async Task<ActionResult<Responses>> AddReview([FromBody] CreateReviewDto review)
+        {
+            return Ok(await _reviewService.AddReviewAsync(review));
+        }
+
+        [HttpPut("UpdateReview")]
+        public async Task<ActionResult<Responses>> UpdateReview(ReviewDto review)
+        {
+            return Ok(await _reviewService.UpdateReviewAsync(review));
+        }
+
 
     }
 }

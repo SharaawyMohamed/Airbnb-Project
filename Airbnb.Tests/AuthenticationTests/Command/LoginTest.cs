@@ -69,7 +69,7 @@ namespace Airbnb.Tests.AuthenticationTests.Command
         }
 
         [Fact]
-        public async Task Login_ShouldReturnFailureResponsw_WhenPasswordIsNotCorrect()
+        public async Task Login_ShouldReturnFailureResponse_WhenPasswordIsNotCorrect()
         {
 
             //Arrange
@@ -101,7 +101,7 @@ namespace Airbnb.Tests.AuthenticationTests.Command
             result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
         [Fact]
-        public async Task Login_ShouldReturnFailureResponsw_WhenEmailIsNotConfemed()
+        public async Task Login_ShouldReturnFailureResponse_WhenEmailIsNotConfirmed()
         {
 
             //Arrange

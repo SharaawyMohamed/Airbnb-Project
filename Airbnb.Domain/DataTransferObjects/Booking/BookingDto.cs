@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Airbnb.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +14,6 @@ namespace Airbnb.Domain.DataTransferObjects.Booking
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public string PaymentMethod { get; set; } = string.Empty;
+        public string PaymentStatus { get; set; } = string.Empty;
     }
 }

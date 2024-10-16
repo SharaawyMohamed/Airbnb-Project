@@ -9,7 +9,7 @@ namespace Airbnb.Infrastructure.Specifications
 {
     public class ReviewWithSpec : BaseSpecifications<Review, int>
     {
-        public ReviewWithSpec(string? propertyId, string? userId) : base(P =>
+        public ReviewWithSpec(string? propertyId=null, string? userId=null) : base(P =>
         (string.IsNullOrWhiteSpace(propertyId) || P.PropertyId == propertyId)
         && (string.IsNullOrWhiteSpace(userId) || P.UserId == userId))
 
