@@ -19,7 +19,7 @@ namespace Airbnb.Infrastructure.Repositories
             _context = context;
             _dbSet = _context.Set<TEntity>();
         }
-
+        // 
         public async Task AddAsync(TEntity entity)
            => await _dbSet.AddAsync(entity);
 
@@ -28,11 +28,8 @@ namespace Airbnb.Infrastructure.Repositories
 
         public void Remove(TEntity entity)
            => _dbSet.Remove(entity);
-
-
         public async Task<IEnumerable<TEntity>>? GetAllAsync()
           => await _dbSet.ToListAsync();
-
 
         public async Task<TEntity>? GetByIdAsync(TKey id)
           => (await _dbSet.FindAsync(id))!;

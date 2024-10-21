@@ -13,7 +13,7 @@ namespace Airbnb.Application.MappingProfiler
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location.Name))
                 .ForMember(dest => dest.Country, otp => otp.MapFrom(src => src.Location.Country.Name))
                 .ForMember(dest => dest.Region, otp => otp.MapFrom(src => src.Location.Country.Region.Name));
-
+          
             CreateMap<PropertyRequest, Property>();
                 
         }

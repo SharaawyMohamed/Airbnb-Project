@@ -4,6 +4,7 @@ using Airbnb.Domain.DataTransferObjects.Country;
 using Airbnb.Domain.DataTransferObjects.Image;
 using Airbnb.Domain.DataTransferObjects.Location;
 using Airbnb.Domain.DataTransferObjects.Region;
+using Airbnb.Domain.DataTransferObjects.Review;
 using Airbnb.Domain.DataTransferObjects.User;
 
 namespace Airbnb.Domain.DataTransferObjects.Property

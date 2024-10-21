@@ -14,7 +14,7 @@ namespace Airbnb.Domain.DataTransferObjects.Property
         public string? Location { get; set; }
         public string? Region { get; set; }
         public float Rate { get; set; }
-        public List<string>?RoomServices { get; set; } = new List<string>();
-        public List<string>? Categories { get; set; }= new List<string>();
+        public IEnumerable<string>?RoomServices { get; set; } = new HashSet<string>();
+        public IEnumerable<string>? Categories { get; set; }= new HashSet<string>();
     }
 }

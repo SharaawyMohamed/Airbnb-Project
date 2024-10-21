@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Airbnb.Domain.DataTransferObjects;
+using Airbnb.Domain.DataTransferObjects.Review;
 using Airbnb.Domain.Entities;
 
 namespace Airbnb.Domain.Interfaces.Services
 {
     public interface IReviewService
     {
-        Task<Responses> GetReviewAsync(int id);
-        Task<Responses> GetAllReviewsAsync(string? propertyId,string? userId);
-        Task<Responses> AddReviewAsync(ReviewDto review); 
-        Task<Responses> UpdateReviewAsync(string userId,int id,ReviewDto review); 
-        Task<Responses> DeleteReviewAsync(int id);
+        Task<Responses> GetReviewById(int id);
+        Task<Responses> GetPropertyReviews(string propertyId);
+        Task<Responses> GetUserReviews(string userId);
+        Task<Responses> AddReviewAsync(CreateReviewDto review); 
+        Task<Responses> UpdateReviewAsync(ReviewDto review); 
+        Task<Responses> DeleteReviewAsync(int ReviewId);
 
     }
 }
