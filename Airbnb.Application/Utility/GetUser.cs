@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Airbnb.Application.Utility
 {
-    internal static class GetUser
+    public static class GetUser
     {
-        internal static async Task<AppUser> GetCurrentUserAsync(IHttpContextAccessor _contextAccessor, UserManager<AppUser> _userManager)
+        public static async Task<AppUser> GetCurrentUserAsync(IHttpContextAccessor _contextAccessor, UserManager<AppUser> _userManager)
         {
             var userClaims = _contextAccessor.HttpContext?.User;
 

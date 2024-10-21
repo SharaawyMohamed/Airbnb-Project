@@ -1,4 +1,5 @@
-﻿using Airbnb.Application.Settings;
+﻿using Airbnb.Application.Features.Notifications;
+using Airbnb.Application.Settings;
 using Airbnb.Application.Utility;
 using Airbnb.Domain;
 using Airbnb.Domain.DataTransferObjects.Property;
@@ -7,10 +8,10 @@ using Airbnb.Domain.Identity;
 using Airbnb.Domain.Interfaces.Repositories;
 using Airbnb.Domain.Interfaces.Services;
 using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Net;
-using System.Security.Claims;
 
 namespace Airbnb.Application.Services
 {
@@ -20,19 +21,22 @@ namespace Airbnb.Application.Services
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IPublisher _publisher;
 
-        public PropertyService(IUnitOfWork unitOfWork,
-            UserManager<AppUser> userManager,
-            IHttpContextAccessor contextAccessor,
-            IMapper mapper)
+		public PropertyService(IUnitOfWork unitOfWork,
+			UserManager<AppUser> userManager,
+			IHttpContextAccessor contextAccessor,
+			IMapper mapper,
+			IPublisher publisher)
 
-        {
-            _unitOfWork = unitOfWork;
-            _userManager = userManager;
-            _contextAccessor = contextAccessor;
-            _mapper = mapper;
-        }
-        public async Task<Responses> CreatePropertyAsync(PropertyRequest propertyDTO)
+		{
+			_unitOfWork = unitOfWork;
+			_userManager = userManager;
+			_contextAccessor = contextAccessor;
+			_mapper = mapper;
+			_publisher = publisher;
+		}
+		public async Task<Responses> CreatePropertyAsync(PropertyRequest propertyDTO)
         {
             var owner = await GetUser.GetCurrentUserAsync(_contextAccessor,_userManager);
             var user = await _userManager.FindByEmailAsync(propertyDTO.OwnereEmail);
@@ -41,28 +45,28 @@ namespace Airbnb.Application.Services
                 return await Responses.FailurResponse("Unauthenticated request!", HttpStatusCode.Unauthorized);
             }
 
-            var Location = await _unitOfWork.Repository<Location, int>().GetByNameAsync(propertyDTO.Location);
+            var Location = await _unitOfWork.Repository<Location, int>().GetByNameAsync(propertyDTO.Location!)!;
             if (Location == null)
             {
                 return await Responses.FailurResponse("Location InValid!", HttpStatusCode.BadRequest);
             }
 
-            var country = await _unitOfWork.Repository<Country, int>().GetByNameAsync(propertyDTO.Country);
+            var country = await _unitOfWork.Repository<Country, int>().GetByNameAsync(propertyDTO.Country!)!;
             if (country == null || Location.CountryId != country.Id)
             {
                 return await Responses.FailurResponse("Country InValid!", HttpStatusCode.BadRequest);
             }
 
-            var Region = await _unitOfWork.Repository<Region, int>().GetByNameAsync(propertyDTO.Region);
+            var Region = await _unitOfWork.Repository<Region, int>().GetByNameAsync(propertyDTO.Region!)!;
             if (Region == null || country.RegionId != Region.Id)
             {
                 return await Responses.FailurResponse("Region InValid!", HttpStatusCode.BadRequest);
             }
 
             var categories = new List<Category>();
-            foreach (var i in propertyDTO.Categories)
+            foreach (var i in propertyDTO.Categories!)
             {
-                var category = await _unitOfWork.Repository<Category, int>().GetByNameAsync(i);
+                var category = await _unitOfWork.Repository<Category, int>().GetByNameAsync(i)!;
                 if (category is not null)
                 {
                     categories.Add(category);
@@ -75,7 +79,7 @@ namespace Airbnb.Application.Services
             }
 
             var images = new List<Image>();
-            foreach (var img in propertyDTO.Images)
+            foreach (var img in propertyDTO.Images!)
             {
                 if (img != null)
                 {
@@ -96,7 +100,7 @@ namespace Airbnb.Application.Services
 
                 var roomServices = new List<RoomService>();
 
-                foreach (var name in propertyDTO.RoomServices)
+                foreach (var name in propertyDTO.RoomServices!)
                 {
                     if (name != null)
                     {
@@ -110,13 +114,13 @@ namespace Airbnb.Application.Services
                 var createdProperty = new Property()
                 {
                     Id = PropertyId,
-                    Name = propertyDTO.Description,
-                    Description = propertyDTO.Description,
+                    Name = propertyDTO.Description!,
+                    Description = propertyDTO.Description!,
                     Rate = 0,
                     Bookings = new List<Booking>(),
                     Reviews = new List<Review>(),
-                    NightPrice = (decimal)propertyDTO.NightPrice,
-                    PlaceType = propertyDTO.PlaceType,
+                    NightPrice = (decimal)propertyDTO.NightPrice!,
+                    PlaceType = propertyDTO.PlaceType!,
                     LocationId = Location.Id,
                     OwnerId = owner.Id,
                     Images = images,
@@ -125,6 +129,7 @@ namespace Airbnb.Application.Services
                 };
                 await _unitOfWork.Repository<Property, string>().AddAsync(createdProperty);
                 await _unitOfWork.CompleteAsync();
+                await _publisher.Publish(new CreatePropertyNotification(createdProperty.Id),CancellationToken.None);
                 return await Responses.SuccessResponse("Property has been created successfully!");
             }
             catch (Exception ex)
@@ -150,7 +155,7 @@ namespace Airbnb.Application.Services
                 return await Responses.FailurResponse("Unauthenticated request!", HttpStatusCode.Unauthorized);
             }
 
-            var property = await _unitOfWork.Repository<Property, string>().GetByIdAsync(propertyId);
+            var property = await _unitOfWork.Repository<Property, string>().GetByIdAsync(propertyId)!;
             if (property == null) return await Responses.FailurResponse("There is no property with this id");
 
             if (property.OwnerId != user.Id)
@@ -250,28 +255,5 @@ namespace Airbnb.Application.Services
             }
 
         }
-
-        #region GetUser
-        //public async Task<AppUser>? GetCurrentUserAsync()
-        //{
-        //    var userClaims = _contextAccessor.HttpContext?.User;
-
-        //    if (userClaims == null || !userClaims.Identity.IsAuthenticated)
-        //    {
-        //        return null;
-        //    }
-
-        //    var userEmail = userClaims.FindFirstValue(ClaimTypes.Email);
-
-        //    if (string.IsNullOrEmpty(userEmail))
-        //    {
-        //        return null;
-        //    }
-
-        //    return await _userManager.FindByEmailAsync(userEmail);
-
-        //} 
-        #endregion
-
     }
 }

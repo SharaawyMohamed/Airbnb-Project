@@ -9,6 +9,6 @@ namespace Airbnb.Domain.Interfaces.Interface
     public interface IChatClient
     {
         Task ReceiveMessage(string message);
-        Task SendMessage(string message);
+        Task SendMessageBroadcast(string ReceiveMessage,string username,string message);
     }
 }

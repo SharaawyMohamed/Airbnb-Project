@@ -1,22 +1,24 @@
-﻿using Airbnb.Domain.Interfaces.Interface;
-using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.SignalR;
+
 
 namespace Airbnb.Application.Chatting
 {
-    public class ChatHub:Hub<IChatClient>
+    public class ChatHub:Hub
     {
-        public override async Task OnConnectedAsync()
+		public async Task SendMessage(string message)
         {
-            await Clients.All.ReceiveMessage($"{Context.ConnectionId}, Has Joined.");
+            await Clients.All.SendAsync("ReceiveMessage",message);
         }
-        public async Task SendMessage(string message)
+
+        public async Task JoinGroup(string groupName)
         {
-            await Clients.All.ReceiveMessage($"{Context.ConnectionId}: {message}");
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
+
+        public async Task SendMessageToGroup(string groupName, string username, string message)
+        {
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", username, message);
+        }
+
     }
 }
