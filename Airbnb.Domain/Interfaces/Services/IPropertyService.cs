@@ -15,6 +15,7 @@ namespace Airbnb.Domain.Interfaces.Services
         Task<Responses> CreatePropertyAsync(PropertyRequest propertyDTO);
         Task<Responses> UpdatePropertyAsync(UpdatePropertyDto propertyDTO);
         Task<Responses> DeletePropertyAsync(string propertyId);
+        // TODO: Notifications
 
     }
 }

@@ -26,7 +26,6 @@ namespace Airbnb.Application.Settings
             // return File name
             return subFilePath;
         }
-        // Delete File
         public static async Task DeleteFile(string fileCategory,string folderName,string? fileName)
         {
             if (fileName == null) return;
