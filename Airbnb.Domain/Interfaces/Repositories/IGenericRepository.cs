@@ -21,6 +21,7 @@ namespace Airbnb.Domain.Interfaces.Repositories
         Task AddAsync(TEntity entity);
         Task AddRangeAsync(IEnumerable<TEntity> entities);
         void UpdateRange(IEnumerable<TEntity> entities);
+        void RemoveRange(IEnumerable<TEntity> entities);
  
         void Update(TEntity entity);
         void Remove(TEntity entity);

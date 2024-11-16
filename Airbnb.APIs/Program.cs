@@ -1,6 +1,7 @@
 using Airbnb.APIs.Extensions;
 using Airbnb.APIs.Utility;
 using Airbnb.Application.Chatting;
+using Airbnb.Application.Rea_Time;
 
 namespace Airbnb.APIs
 {
@@ -20,10 +21,8 @@ namespace Airbnb.APIs
 
 			var app = builder.Build();
 
-			// Apply Pending Migrations on Database
 			await ExtensionMethods.ApplyMigrations(app);
 
-			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
@@ -36,7 +35,8 @@ namespace Airbnb.APIs
 			app.UseAuthorization();
 
 			app.MapControllers();
-			app.MapHub<ChatHub>("chathub");
+			app.MapHub<ChatHub>("chatHub");
+			app.MapHub<NotificationHub>("notificationHub");
 
 			app.Run();
 		}

@@ -8,8 +8,8 @@ namespace Airbnb.Domain.DataTransferObjects.Review
 {
 	public class CreateReviewDto
 	{
-		public string UserId { get; set; }
-		public string PropertyId { get; set; }
+		public string UserId { get; set; } = string.Empty;
+		public string PropertyId { get; set; }= string.Empty;
 		public string Comment { get; set; } = string.Empty;
 		public int Stars { get; set; }
 	}

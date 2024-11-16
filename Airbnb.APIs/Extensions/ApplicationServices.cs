@@ -1,5 +1,6 @@
 ﻿using Airbnb.APIs.MiddelWairs;
 using Airbnb.Application.Features.PaymentBooking.Command.CreateBooking;
+using Airbnb.Application.Rea_Time;
 using Airbnb.Application.Resolvers;
 using Airbnb.Application.Services;
 using Airbnb.Application.Settings;
@@ -78,6 +79,7 @@ namespace Airbnb.APIs.Extensions
 			Services.AddTransient<IMailService, MailService>();
 			Services.AddTransient<ExceptionMiddleWare>();
 			Services.AddFluentValidationAutoValidation();
+			Services.AddSingleton<UserConnectionManager>();
 			#endregion
 
 			#region Mediator Service
