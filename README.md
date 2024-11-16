@@ -177,48 +177,21 @@ Here is a comprehensive list of **31 endpoints**, categorized by their roles in 
 
 ---
 
-## **Payment Integration**
+## **Property Filtering and Sorting**
 
-### **Overview**
-The project integrates with a payment gateway (such as **Stripe**, **PayPal**, or **Razorpay**) to handle payments for property bookings. This integration allows users to make secure payments for their bookings, manage booking payments, and handle payment statuses.
+### **GET `/api/Property/GetProperties`**
 
-### **Payment Workflow**
-1. **Booking Creation**:
-   - When a user books a property, they can initiate the payment process.
-   
-2. **Payment Processing**:
-   - The backend interacts with the payment gateway API to process the payment. This involves sending the payment method details and amount to the gateway, which then processes the payment.
-   
-3. **Payment Confirmation**:
-   - Upon a successful payment, the backend receives a response from the payment gateway, confirming that the payment has been completed.
-   
-4. **Payment Confirmation and Booking Finalization**:
-   - Once the payment is confirmed, the booking is marked as paid, and the user receives a confirmation notification (via SignalR).
-   
-5. **Payment Refunds (if applicable)**:
-   - If a booking is canceled, users can request a refund. The payment gateway's API is used to process the refund, and the status of the booking is updated accordingly.
+This endpoint retrieves a list of properties with various filtering and sorting options.
 
-### **Payment Endpoints**
-Here are the relevant endpoints for payment processing:
+#### **Query Parameters**
+- **sort** (`string`): Sort properties by rate or price (e.g., `RateAsc`, `NightPriceDesc`, `Name`).
+- **categoryName** (`string`): Filter by property category (e.g., apartment, house).
+- **locationId** (`integer`): Filter by location ID.
+- **startDate** (`string` - date-time): Filter properties available starting from this date.
+- **endDate** (`string` - date-time): Filter properties available until this date.
+- **pageIndex** (`integer`): The page number for pagination.
+- **pageSize** (`integer`): The number of properties per page.
 
-#### **PaymentBooking Endpoints**
-- **POST `/api/PaymentBooking/PayBooking`**  
-  Initiates the payment process for a booking. The payment method and booking details are passed to the payment gateway for processing.
-
-- **POST `/api/PaymentBooking/RegisterBooking`**  
-  Registers a new booking for payment processing, preparing the transaction for the user to complete.
-
----
-
-## **Redis Integration**
-
-Redis is utilized for:
-- **Session Caching:** Reduces database load by caching frequently used user session data.
-- **Property Listings Cache:** Enhances response time for property search and filters.
-
-### **Configuration**
-Ensure Redis is running and update the connection string in `appsettings.json`:
-```json
-"Redis": {
-  "ConnectionString": "localhost:6379"
-}
+#### **Example Request**
+```http
+GET /api/Property/GetProperties?sort=RateDesc&categoryName=Apartment&locationId=1&startDate=2024-12-01&endDate=2024-12-10&pageIndex=1&pageSize=10
