@@ -62,8 +62,6 @@ Whether you’re a developer exploring modern .NET practices or a stakeholder lo
 - **Redis** is used for optimizing frequently accessed resources such as:
   - User sessions
   - Property listings
-  - Notification data
-
 ---
 
 ## **Project Architecture**
@@ -118,8 +116,6 @@ This project implements several design patterns:
 1. **Users**: Stores user credentials and profile details.
 2. **Properties**: Contains property details like description, location, and images.
 3. **Bookings**: Tracks property reservations and booking statuses.
-4. **Notifications**: Stores notifications for system-wide and user-specific messages.
-
 ---
 
 ## **Endpoints**
@@ -219,7 +215,6 @@ Here are the relevant endpoints for payment processing:
 Redis is utilized for:
 - **Session Caching:** Reduces database load by caching frequently used user session data.
 - **Property Listings Cache:** Enhances response time for property search and filters.
-- **Notifications Cache:** Stores user-specific notification data for quick access.
 
 ### **Configuration**
 Ensure Redis is running and update the connection string in `appsettings.json`:
