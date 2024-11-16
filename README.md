@@ -150,7 +150,7 @@ Here is a comprehensive list of **31 endpoints**, categorized by their roles in 
 ---
 
 ### **Property Endpoints**
-16. **GET `/api/Property/GetProperties`**: Retrieve a list of properties.
+- **[GET `/api/Property/GetProperties`](#get-apipropertygetproperties)**: Retrieve a list of properties.
 17. **GET `/api/Property/GetProperty/{propertyId}`**: Retrieve a specific property by ID.
 18. **POST `/api/Property/CreateProperty`**: Add a new property.
 19. **DELETE `/api/Property/DeleteProperty/{propertyId}`**: Delete a property by ID.
@@ -179,7 +179,7 @@ Here is a comprehensive list of **31 endpoints**, categorized by their roles in 
 
 ## **Property Filtering and Sorting**
 
-### **GET `/api/Property/GetProperties`**
+## **Detailed Description of GET /api/Property/GetProperties**
 
 This endpoint retrieves a list of properties with various filtering and sorting options.
 
@@ -191,7 +191,3 @@ This endpoint retrieves a list of properties with various filtering and sorting 
 - **endDate** (`string` - date-time): Filter properties available until this date.
 - **pageIndex** (`integer`): The page number for pagination.
 - **pageSize** (`integer`): The number of properties per page.
-
-#### **Example Request**
-```http
-GET /api/Property/GetProperties?sort=RateDesc&categoryName=Apartment&locationId=1&startDate=2024-12-01&endDate=2024-12-10&pageIndex=1&pageSize=10
