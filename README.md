@@ -1,165 +1,130 @@
-# Airbnb Clone - Backend
+# **Airbnb Project Clone**
 
-## Project Overview
-This project is a backend implementation for an Airbnb clone, developed using .NET Core. The system provides essential features like property listings, booking management, user authentication, and Stripe payment integration.
+## **Overview**
+This is a backend-focused project replicating key functionalities of Airbnb. Built using **.NET Core 8**, it emphasizes clean architecture, real-time notifications, and scalability. The application provides features such as property listings, booking management, and user authentication.
 
-## Features
-- **User Authentication**: Register, login, and manage user sessions securely using JWT.
-- **Property Listings**: Create, update, and manage property listings with filtering options.
-- **Booking Management**: Manage property bookings with task scheduling for updates.
-- **Search and Filters**: Implemented advanced filtering for property search (location, price, availability).
-- **Payment Integration**: Seamless payment processing using Stripe API.
-- **Role-Based Access**: Admin, host, and guest roles with specific privileges.
+---
 
-## Technology Stack
-- **Language**: C#
-- **Framework**: .NET Core
-- **ORM**: Entity Framework Core
-- **Authentication**: JWT (JSON Web Tokens)
-- **Payment Gateway**: Stripe API
-- **Database**: SQL Server
-- **Architecture**: Clean Architecture
-- **Design Patterns**: Repository, Unit of Work, Dependency Injection
-- **Caching**: Implemented to optimize performance
+## **Table of Contents**
+- [Overview](#overview)
+- [Technologies Used](#technologies-used)
+- [Features](#features)
+- [Design Patterns](#design-patterns)
+- [Services and Tools](#services-and-tools)
+- [Database Schema](#database-schema)
+- [Endpoints](#endpoints)
+- [Installation and Setup](#installation-and-setup)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Setup & Installation
+---
+
+## **Technologies Used**
+- **Backend Framework:** .NET Core 8
+- **Real-time Communication:** SignalR
+- **Data Storage:** SQL Server, Entity Framework Core
+- **Caching:** In-Memory Cache
+- **Authentication & Authorization:** ASP.NET Identity, JWT
+- **Dependency Injection:** Built-in DI in .NET
+- **Messaging:** MediatR for CQRS pattern
+- **Testing:** xUnit for unit testing
+- **Others:** AutoMapper, FluentValidation, Swagger
+
+---
+
+## **Features**
+- **User Management:**
+  - Registration, Login, and Email Confirmation
+  - Profile management
+- **Property Management:**
+  - Add, Edit, and Delete listings
+  - Property search with filtering
+- **Booking System:**
+  - Reserve properties with real-time updates
+- **Real-time Notifications:**
+  - Public notifications for system updates
+  - User-specific notifications using SignalR
+- **Caching:**
+  - Optimized data retrieval for high performance
+- **Testing:**
+  - Unit tests for core services and controllers
+
+---
+
+## **Design Patterns**
+This project follows modern software engineering principles and design patterns:
+
+- **CQRS (Command Query Responsibility Segregation):**
+  - Separation of commands (write operations) and queries (read operations) using MediatR.
+- **Repository Pattern:**
+  - Abstracting database operations with repositories.
+- **Dependency Injection:**
+  - Used for loose coupling and better testability.
+- **Singleton Pattern:**
+  - For services like caching and SignalR user connection management.
+- **Factory Pattern:**
+  - To create instances for different types of notifications.
+- **Observer Pattern:**
+  - SignalR clients observe changes and receive real-time updates.
+
+---
+
+## **Services and Tools**
+- **User Management:** ASP.NET Identity for authentication and JWT for secure API access.
+- **Notification Service:** SignalR for real-time user notifications.
+- **Email Service:** SMTP or a third-party service like SendGrid for email confirmations.
+- **Caching Service:** In-memory caching for reducing database load.
+- **Database Access:** Entity Framework Core with migrations for database versioning.
+
+---
+
+## **Database Schema**
+### Key Tables:
+1. **Users**
+   - Stores user details and roles.
+2. **Properties**
+   - Stores property details (name, location, price, etc.).
+3. **Bookings**
+   - Tracks property reservations.
+4. **Notifications**
+   - Logs user-specific and public notifications.
+
+---
+
+## **Endpoints**
+### **Authentication:**
+- **POST** `/api/auth/register`: Register a new user.
+- **POST** `/api/auth/login`: Login and receive a JWT.
+- **POST** `/api/auth/confirm-email`: Confirm email address.
+
+### **Properties:**
+- **GET** `/api/properties`: Get all properties with filters.
+- **POST** `/api/properties`: Add a new property.
+- **PUT** `/api/properties/{id}`: Edit property details.
+- **DELETE** `/api/properties/{id}`: Delete a property.
+
+### **Bookings:**
+- **POST** `/api/bookings`: Book a property.
+- **GET** `/api/bookings/user`: Get user-specific bookings.
+
+### **Notifications:**
+- **GET** `/api/notifications`: Get user notifications.
+- **POST** `/api/notifications/public`: Send a public notification.
+
+### **Real-Time Communication:**
+- **Hub** `/notificationHub`: Handle real-time notifications using SignalR.
+
+---
+
+## **Installation and Setup**
+### Prerequisites:
+- .NET Core SDK 8+
+- SQL Server
+- Visual Studio or any IDE supporting .NET
+
+### Steps:
 1. Clone the repository:
-    ```bash
-    git clone https://github.com/SharaawyMohamed/Airbnb-Project.git
-    ```
-2. Navigate to the project directory:
-    ```bash
-    cd Airbnb-Project
-    ```
-3. Install the necessary packages:
-    ```bash
-    dotnet restore
-    ```
-4. Update the connection string in `appsettings.json` to match your database configuration.
-5. Run database migrations:
-    ```bash
-    dotnet ef database update
-    ```
-6. Run the project:
-    ```bash
-    dotnet run
-    ```
-
-# Airbnb Clone API Documentation
-
-## Account Endpoints
-
-- **POST** `/api/Account/Login`  
-  Allows users to log in to the system.
-
-- **GET** `/api/Account/SignOut`  
-  Signs out the user from the system.
-
-- **POST** `/api/Account/Register`  
-  Registers a new user in the system.
-
-- **POST** `/api/Account/EmailConfirmation`  
-  Confirms user email.
-
-- **GET** `/api/Account/ForgetPassword`  
-  Initiates the password reset process by sending an email to the user.
-
-- **PUT** `/api/Account/ResetPassword`  
-  Resets the user's password after confirmation.
-
----
-
-## Booking Endpoints
-
-- **POST** `/api/Booking/CreateBooking`  
-  Creates a new booking.
-
-- **GET** `/api/Booking/GetBookings/{userId}`  
-  Retrieves all bookings for a specific user.
-
-- **DELETE** `/api/Booking/DeleteBooking/{bookingId}`  
-  Deletes a booking with the specified ID.
-
----
-
-## Property Endpoints
-
-- **GET** `/api/Property/GetProperties`  
-  Retrieves all available properties.
-
-- **GET** `/api/Property/GetProperty/{propertyId}`  
-  Retrieves details of a property by its ID.
-
-- **POST** `/api/Property/CreateProperty`  
-  Creates a new property listing.
-
-- **DELETE** `/api/Property/DeleteProperty/{propertyId}`  
-  Deletes a property by its ID.
-
-- **PUT** `/api/Property/UpdateProperty`  
-  Updates details of an existing property.
-
----
-
-## Review Endpoints
-
-- **GET** `/api/Review/GetAllReviews`  
-  Retrieves all reviews for properties.
-
-- **GET** `/api/Review/GetReviewDetails`  
-  Retrieves details of a specific review.
-
-- **POST** `/api/Review/CreateReview`  
-  Creates a new review for a property.
-
-- **PUT** `/api/Review/UpdateReview/{id}`  
-  Updates a specific review by its ID.
-
-- **DELETE** `/api/Review/{id}`  
-  Deletes a specific review by its ID.
-
----
-
-## Users Endpoints
-
-- **GET** `/api/Users/GetAllUsers`  
-  Retrieves a list of all users.
-
-- **GET** `/api/Users/GetUserById/{Id}`  
-  Retrieves details of a user by their ID.
-
-- **DELETE** `/api/Users/RemoveUser/{Id}`  
-  Deletes a user by their ID.
-
-- **POST** `/api/Users/CreateUser`  
-  Creates a new user in the system.
-
-- **PUT** `/api/Users/UpdateUser`  
-  Updates an existing user's information.
-
----
-
-## Additional Schemas and DTOs
-
-- **CreateBookingCommand**  
-  Data transfer object for creating a booking.
-
-- **ForgetPasswordDto**  
-  Data transfer object for forgetting a password.
-
-- **LoginDTO**  
-  Data transfer object for user login.
-
-- **ResetPasswordDTO**  
-  Data transfer object for resetting a password.
-
-- **ReviewDto**  
-  Data transfer object for reviews.
-
----
-
-## Contribution
-Feel free to contribute to this project by submitting a pull request or reporting issues.
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+   ```bash
+   git clone https://github.com/SharaawyMohamed/Airbnb-Project.git
+   cd Airbnb-Project
