@@ -13,6 +13,6 @@ namespace Airbnb.Domain.Interfaces.Services
         Task<Responses> CreateUserAsync(RegisterDTO userDto);
         Task<Responses> EmailConfirmation(string? email, string? code);
         Task<Responses> ForgetPassword(ForgetPasswordDto forgetPassword);
-        Task<Responses> RemoveUser(AppUser user);
+        Task<Responses> RemoveUser(string userId);
     }
 }

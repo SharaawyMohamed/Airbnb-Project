@@ -54,13 +54,7 @@ namespace Airbnb.APIs.Controllers
         [HttpDelete("RemoveUser/{Id}")]
         public async Task<ActionResult<Responses>> RemoveUser([FromRoute] string Id)
         {
-
-            var user = await _userManager.FindByIdAsync(Id);
-            if (user == null)
-            {
-                return Ok(await Responses.FailurResponse("InValid User Id", HttpStatusCode.NotFound));
-            }
-           return Ok(await _userService.RemoveUser(user));
+           return Ok(await _userService.RemoveUser(Id));
         }
 
         [HttpPost("CreateUser")]

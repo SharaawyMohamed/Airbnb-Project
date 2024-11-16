@@ -21,20 +21,20 @@ namespace Airbnb.Application.Services
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly IPublisher _publisher;
-
+        private readonly IMediator _mediator;
 		public PropertyService(IUnitOfWork unitOfWork,
 			UserManager<AppUser> userManager,
 			IHttpContextAccessor contextAccessor,
 			IMapper mapper,
-			IPublisher publisher)
+			IPublisher publisher,
+			IMediator mediator)
 
 		{
 			_unitOfWork = unitOfWork;
 			_userManager = userManager;
 			_contextAccessor = contextAccessor;
 			_mapper = mapper;
-			_publisher = publisher;
+			_mediator = mediator;
 		}
 		public async Task<Responses> CreatePropertyAsync(PropertyRequest propertyDTO)
         {
@@ -129,8 +129,15 @@ namespace Airbnb.Application.Services
                 };
                 await _unitOfWork.Repository<Property, string>().AddAsync(createdProperty);
                 await _unitOfWork.CompleteAsync();
-                await _publisher.Publish(new CreatePropertyNotification(createdProperty.Id),CancellationToken.None);
-                return await Responses.SuccessResponse("Property has been created successfully!");
+
+				await _mediator.Publish(new NotificationEvent()
+				{
+					Message = "Your Property has been added successfully!",
+					UserId = owner.Id,
+					IsPublic = false
+				});
+
+				return await Responses.SuccessResponse("Property has been created successfully!");
             }
             catch (Exception ex)
             {
@@ -162,10 +169,13 @@ namespace Airbnb.Application.Services
             {
                 return await Responses.FailurResponse("Unauthenticated request!", HttpStatusCode.Unauthorized);
             }
+            if (property.Bookings.Any())
+            {
+                return await Responses.FailurResponse("You can't remove you property, It's already booked!", HttpStatusCode.Unauthorized);
+            }
             try
             {
                 _unitOfWork.Repository<Property, string>().Remove(property);
-                // remove all images for this propertiy from server
                 var Images = property.Images;
                 foreach (var i in Images)
                 {
@@ -176,7 +186,13 @@ namespace Airbnb.Application.Services
                     }
                 }
                 await _unitOfWork.CompleteAsync();
-                return await Responses.SuccessResponse("Property has been deleted successfully!");
+				await _mediator.Publish(new NotificationEvent()
+				{
+					Message = "Property Deleted Successfully",
+					UserId = property.OwnerId,
+					IsPublic = false
+				});
+				return await Responses.SuccessResponse("Property has been deleted successfully!");
             }
             catch (Exception ex)
             {
@@ -201,7 +217,7 @@ namespace Airbnb.Application.Services
                 return await Responses.FailurResponse("Unauthenticated request!", HttpStatusCode.Unauthorized);
             }
 
-            var property = await _unitOfWork.Repository<Property, string>().GetByIdAsync(propertyId);
+            var property = await _unitOfWork.Repository<Property, string>().GetByIdAsync(propertyId)!;
 
             if (property == null) return await Responses.FailurResponse("InValid propertyId ", HttpStatusCode.NotFound);
 
@@ -220,7 +236,7 @@ namespace Airbnb.Application.Services
                 return await Responses.FailurResponse("Unauthenticated request!", HttpStatusCode.Unauthorized);
             }
 
-            var property = await _unitOfWork.Repository<Property, string>().GetByIdAsync(propertyDTO.PropertyId);
+            var property = await _unitOfWork.Repository<Property, string>().GetByIdAsync(propertyDTO.PropertyId)!;
 
             if (property == null) return await Responses.FailurResponse("Property is not found!", HttpStatusCode.NotFound);
 
@@ -246,7 +262,14 @@ namespace Airbnb.Application.Services
 
                 _unitOfWork.Repository<Property, string>().Update(property);
                 await _unitOfWork.CompleteAsync();
-                return await Responses.SuccessResponse("Property has been updated successfully!");
+
+				await _mediator.Publish(new NotificationEvent()
+				{
+					Message = "See new updates!",
+					IsPublic = true
+				});
+
+				return await Responses.SuccessResponse("Property has been updated successfully!");
             }
             catch (Exception ex)
             {
