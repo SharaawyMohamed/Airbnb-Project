@@ -15,6 +15,7 @@ Whether you’re a developer exploring modern .NET practices or a stakeholder lo
 - [Design Patterns](#design-patterns)
 - [Database Schema](#database-schema)
 - [Endpoints](#endpoints)
+- [Payment Integration](#payment-integration)
 - [Redis Integration](#redis-integration)
 - [Installation and Setup](#installation-and-setup)
 - [Testing](#testing)
@@ -33,7 +34,7 @@ Whether you’re a developer exploring modern .NET practices or a stakeholder lo
 - **API Documentation:** Swagger/OpenAPI
 - **Testing Framework:** xUnit with Moq
 - **Messaging Pattern:** MediatR for CQRS implementation
-- **Additional Tools:** AutoMapper, FluentValidation, Dependency Injection
+- **Additional Tools:** AutoMapper, Mapster, FluentValidation, SendEmail, Dependency Injection
 
 ---
 
@@ -106,6 +107,8 @@ This project implements several design patterns:
   - Used in SignalR to push real-time notifications to connected clients.
 - **Dependency Injection:**
   - Achieved via ASP.NET Core's built-in DI container for better modularity.
+- **UnitOfWork:**
+  - Ensures atomicity by coordinating multiple repository operations within a single transaction, allowing changes to be committed or rolled back as a unit.
 
 ---
 
@@ -124,65 +127,90 @@ This project implements several design patterns:
 Here is a comprehensive list of **31 endpoints**, categorized by their roles in the system:
 
 ### **Authentication Endpoints**
-1. **POST `/api/auth/register`**: Register a new user and send a confirmation email.  
-2. **POST `/api/auth/login`**: Authenticate user and return a JWT token.  
-3. **POST `/api/auth/confirm-email`**: Activate user account through email verification.  
-4. **POST `/api/auth/forgot-password`**: Send password reset instructions.  
-5. **POST `/api/auth/reset-password`**: Reset user password.  
+1. **POST `/api/Account/Login`**: Authenticate user and return a JWT token.
+2. **GET `/api/Account/SignOut`**: Sign out the user.
+3. **POST `/api/Account/Register`**: Register a new user and send a confirmation email.
+4. **POST `/api/Account/EmailConfirmation`**: Activate user account through email verification.
+5. **GET `/api/Account/ForgetPassword`**: Send password reset instructions.
+6. **PUT `/api/Account/ResetPassword`**: Reset user password.
+
+---
+
+### **Booking Endpoints**
+7. **GET `/api/Bookings/GetUserBookings`**: Retrieve bookings for a user.
+8. **GET `/api/Bookings/GetBookingById`**: Retrieve booking details by ID.
+9. **GET `/api/Bookings/GetAllBookings`**: Retrieve all bookings.
+
+---
+
+### **Payment Booking Endpoints**
+10. **GET `/api/PaymentBooking/GetBookingById/{bookingId}`**: Get payment details for a specific booking.
+11. **POST `/api/PaymentBooking/CreateBooking`**: Create a payment booking.
+12. **PUT `/api/PaymentBooking/UpdateBooking`**: Update a payment booking.
+13. **DELETE `/api/PaymentBooking/DeleteBooking/{bookingId}`**: Delete a booking.
+14. **POST `/api/PaymentBooking/PayBooking`**: Pay for a booking.
+15. **POST `/api/PaymentBooking/RegisterBooking`**: Register a new booking.
+
+---
+
+### **Property Endpoints**
+16. **GET `/api/Property/GetProperties`**: Retrieve a list of properties.
+17. **GET `/api/Property/GetProperty/{propertyId}`**: Retrieve a specific property by ID.
+18. **POST `/api/Property/CreateProperty`**: Add a new property.
+19. **DELETE `/api/Property/DeleteProperty/{propertyId}`**: Delete a property by ID.
+20. **PUT `/api/Property/UpdateProperty`**: Update an existing property.
+
+---
+
+### **Review Endpoints**
+21. **GET `/api/Review/GetPropertyReviews`**: Retrieve reviews for a property.
+22. **GET `/api/Review/GetUserReviews`**: Retrieve reviews made by a user.
+23. **GET `/api/Review/GetReviewById/{id}`**: Retrieve a review by its ID.
+24. **DELETE `/api/Review/DeleteReview/{id}`**: Delete a review by ID.
+25. **POST `/api/Review/CreateReview`**: Create a new review.
+26. **PUT `/api/Review/UpdateReview`**: Update an existing review.
 
 ---
 
 ### **User Management Endpoints**
-6. **GET `/api/users/profile`**: Retrieve logged-in user's profile.  
-7. **PUT `/api/users/profile`**: Update user profile details.  
-8. **DELETE `/api/users`**: Delete user account.  
+27. **GET `/api/Users/GetAllUsers`**: Retrieve a list of all users.
+28. **GET `/api/Users/GetUserById/{Id}`**: Retrieve a user by ID.
+29. **DELETE `/api/Users/RemoveUser/{Id}`**: Delete a user by ID.
+30. **POST `/api/Users/CreateUser`**: Create a new user.
+31. **PUT `/api/Users/UpdateUser`**: Update user details.
 
 ---
 
-### **Property Management Endpoints**
-9. **GET `/api/properties`**: List all properties with filters (e.g., price, location).  
-10. **GET `/api/properties/{id}`**: Get details of a specific property.  
-11. **POST `/api/properties`**: Add a new property.  
-12. **PUT `/api/properties/{id}`**: Update a property.  
-13. **DELETE `/api/properties/{id}`**: Remove a property from the system.  
+## **Payment Integration**
 
----
+### **Overview**
+The project integrates with a payment gateway (such as **Stripe**, **PayPal**, or **Razorpay**) to handle payments for property bookings. This integration allows users to make secure payments for their bookings, manage booking payments, and handle payment statuses.
 
-### **Booking Management Endpoints**
-14. **GET `/api/bookings`**: List all bookings for a user or admin.  
-15. **GET `/api/bookings/{id}`**: Retrieve booking details.  
-16. **POST `/api/bookings`**: Create a new booking for a property.  
-17. **PUT `/api/bookings/{id}`**: Modify booking details.  
-18. **DELETE `/api/bookings/{id}`**: Cancel a booking.  
+### **Payment Workflow**
+1. **Booking Creation**:
+   - When a user books a property, they can initiate the payment process.
+   
+2. **Payment Processing**:
+   - The backend interacts with the payment gateway API to process the payment. This involves sending the payment method details and amount to the gateway, which then processes the payment.
+   
+3. **Payment Confirmation**:
+   - Upon a successful payment, the backend receives a response from the payment gateway, confirming that the payment has been completed.
+   
+4. **Payment Confirmation and Booking Finalization**:
+   - Once the payment is confirmed, the booking is marked as paid, and the user receives a confirmation notification (via SignalR).
+   
+5. **Payment Refunds (if applicable)**:
+   - If a booking is canceled, users can request a refund. The payment gateway's API is used to process the refund, and the status of the booking is updated accordingly.
 
----
+### **Payment Endpoints**
+Here are the relevant endpoints for payment processing:
 
-### **Notification Endpoints**
-19. **GET `/api/notifications`**: Retrieve user-specific notifications.  
-20. **POST `/api/notifications/public`**: Broadcast public notifications.  
-21. **DELETE `/api/notifications/{id}`**: Remove specific notifications.  
+#### **PaymentBooking Endpoints**
+- **POST `/api/PaymentBooking/PayBooking`**  
+  Initiates the payment process for a booking. The payment method and booking details are passed to the payment gateway for processing.
 
----
-
-### **Admin Endpoints**
-22. **GET `/api/admin/users`**: Retrieve all user profiles for administrative purposes.  
-23. **DELETE `/api/admin/users/{id}`**: Remove a user account.  
-24. **GET `/api/admin/properties`**: Retrieve all properties for review.  
-25. **DELETE `/api/admin/properties/{id}`**: Remove a property from the system.  
-
----
-
-### **Real-Time Communication**
-26. **Hub `/notificationHub`**: Handle SignalR real-time communication.  
-
----
-
-### **Utility Endpoints**
-27. **GET `/api/cache/properties`**: Fetch cached property data.  
-28. **POST `/api/cache/clear`**: Clear specific Redis cache entries.  
-29. **GET `/api/stats`**: Retrieve system performance metrics.  
-30. **GET `/api/logs`**: Fetch application logs.  
-31. **POST `/api/reports`**: Submit bug reports or issues.  
+- **POST `/api/PaymentBooking/RegisterBooking`**  
+  Registers a new booking for payment processing, preparing the transaction for the user to complete.
 
 ---
 
