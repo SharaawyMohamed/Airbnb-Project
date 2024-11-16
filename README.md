@@ -1,7 +1,9 @@
-# **Airbnb Project Clone**
+# **Airbnb Clone Backend Project**
 
 ## **Overview**
-This is a backend-focused project replicating key functionalities of Airbnb. Built using **.NET Core 8**, it emphasizes clean architecture, real-time notifications, and scalability. The application provides features such as property listings, booking management, and user authentication.
+This project is a **backend implementation of an Airbnb Clone**, designed to replicate core functionalities of the Airbnb platform. Built with **.NET Core 8**, it focuses on clean architecture, scalability, and real-time communication. It provides seamless features for user authentication, property listings, booking management, and notification services.  
+
+Whether you’re a developer exploring modern .NET practices or a stakeholder looking for a robust solution, this project demonstrates best practices, including **CQRS**, **Dependency Injection**, and real-time notifications with **SignalR**.
 
 ---
 
@@ -9,122 +11,73 @@ This is a backend-focused project replicating key functionalities of Airbnb. Bui
 - [Overview](#overview)
 - [Technologies Used](#technologies-used)
 - [Features](#features)
+- [Project Architecture](#project-architecture)
 - [Design Patterns](#design-patterns)
-- [Services and Tools](#services-and-tools)
 - [Database Schema](#database-schema)
 - [Endpoints](#endpoints)
 - [Installation and Setup](#installation-and-setup)
 - [Usage](#usage)
+- [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
+- [Contact](#contact)
 
 ---
 
 ## **Technologies Used**
 - **Backend Framework:** .NET Core 8
-- **Real-time Communication:** SignalR
+- **Real-Time Communication:** SignalR
 - **Data Storage:** SQL Server, Entity Framework Core
+- **Authentication & Authorization:** ASP.NET Identity, JWT Tokens
 - **Caching:** In-Memory Cache
-- **Authentication & Authorization:** ASP.NET Identity, JWT
-- **Dependency Injection:** Built-in DI in .NET
-- **Messaging:** MediatR for CQRS pattern
-- **Testing:** xUnit for unit testing
-- **Others:** AutoMapper, FluentValidation, Swagger
+- **API Documentation:** Swagger/OpenAPI
+- **Testing:** xUnit with Mocking
+- **Messaging Pattern:** MediatR for CQRS
+- **Others:** AutoMapper, FluentValidation, Dependency Injection
 
 ---
 
 ## **Features**
-- **User Management:**
-  - Registration, Login, and Email Confirmation
-  - Profile management
-- **Property Management:**
-  - Add, Edit, and Delete listings
-  - Property search with filtering
-- **Booking System:**
-  - Reserve properties with real-time updates
-- **Real-time Notifications:**
-  - Public notifications for system updates
-  - User-specific notifications using SignalR
-- **Caching:**
-  - Optimized data retrieval for high performance
-- **Testing:**
-  - Unit tests for core services and controllers
+
+### **1. User Management**
+- **Registration & Login**: Secure user authentication with email confirmation.
+- **JWT Authentication**: Generate and validate JSON Web Tokens for API access.
+- **User Profiles**: View and update profile information.
+
+### **2. Property Management**
+- **CRUD Operations**: Create, update, delete, and retrieve property listings.
+- **Search & Filter**: Search properties by location, price, or features.
+- **Hosting Features**: Users can manage their listed properties.
+
+### **3. Booking System**
+- **Reserve Properties**: Book available properties with date validation.
+- **View Bookings**: Users can view and manage their reservations.
+- **Cancellation Policies**: Implemented through business rules.
+
+### **4. Real-Time Notifications**
+- **Public Notifications**: Broadcast system-wide updates.
+- **User-Specific Notifications**: Notify users about their actions or updates (e.g., booking confirmations) using **SignalR**.
+
+### **5. Caching**
+- **In-Memory Cache**: Reduces load on the database for frequently accessed data.
+
+### **6. Testing**
+- **Unit Tests**: Comprehensive unit tests for business logic and services.
+- **Mocking Framework**: Ensures isolated tests for each component.
 
 ---
 
-## **Design Patterns**
-This project follows modern software engineering principles and design patterns:
+## **Project Architecture**
 
-- **CQRS (Command Query Responsibility Segregation):**
-  - Separation of commands (write operations) and queries (read operations) using MediatR.
-- **Repository Pattern:**
-  - Abstracting database operations with repositories.
-- **Dependency Injection:**
-  - Used for loose coupling and better testability.
-- **Singleton Pattern:**
-  - For services like caching and SignalR user connection management.
-- **Factory Pattern:**
-  - To create instances for different types of notifications.
-- **Observer Pattern:**
-  - SignalR clients observe changes and receive real-time updates.
+This project follows **Clean Architecture** principles, ensuring separation of concerns:
+- **Domain Layer**: Business logic and core entities.
+- **Application Layer**: Application-specific business rules (CQRS, MediatR).
+- **Infrastructure Layer**: Data persistence, third-party integrations (e.g., SignalR, SMTP).
+- **Presentation Layer**: Exposes RESTful APIs via controllers.
 
----
-
-## **Services and Tools**
-- **User Management:** ASP.NET Identity for authentication and JWT for secure API access.
-- **Notification Service:** SignalR for real-time user notifications.
-- **Email Service:** SMTP or a third-party service like SendGrid for email confirmations.
-- **Caching Service:** In-memory caching for reducing database load.
-- **Database Access:** Entity Framework Core with migrations for database versioning.
-
----
-
-## **Database Schema**
-### Key Tables:
-1. **Users**
-   - Stores user details and roles.
-2. **Properties**
-   - Stores property details (name, location, price, etc.).
-3. **Bookings**
-   - Tracks property reservations.
-4. **Notifications**
-   - Logs user-specific and public notifications.
-
----
-
-## **Endpoints**
-### **Authentication:**
-- **POST** `/api/auth/register`: Register a new user.
-- **POST** `/api/auth/login`: Login and receive a JWT.
-- **POST** `/api/auth/confirm-email`: Confirm email address.
-
-### **Properties:**
-- **GET** `/api/properties`: Get all properties with filters.
-- **POST** `/api/properties`: Add a new property.
-- **PUT** `/api/properties/{id}`: Edit property details.
-- **DELETE** `/api/properties/{id}`: Delete a property.
-
-### **Bookings:**
-- **POST** `/api/bookings`: Book a property.
-- **GET** `/api/bookings/user`: Get user-specific bookings.
-
-### **Notifications:**
-- **GET** `/api/notifications`: Get user notifications.
-- **POST** `/api/notifications/public`: Send a public notification.
-
-### **Real-Time Communication:**
-- **Hub** `/notificationHub`: Handle real-time notifications using SignalR.
-
----
-
-## **Installation and Setup**
-### Prerequisites:
-- .NET Core SDK 8+
-- SQL Server
-- Visual Studio or any IDE supporting .NET
-
-### Steps:
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/SharaawyMohamed/Airbnb-Project.git
-   cd Airbnb-Project
+### **Folder Structure**
+```plaintext
+├── Airbnb.Domain                 # Entities, Interfaces, DTOs
+├── Airbnb.Application            # Business logic (CQRS, Services, Event Handling)
+├── Airbnb.Infrastructure         # Database, External Services
+├── Airbnb.API                    # Controllers and Middleware
