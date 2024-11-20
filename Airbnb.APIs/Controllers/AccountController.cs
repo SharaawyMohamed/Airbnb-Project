@@ -32,6 +32,7 @@ namespace Airbnb.APIs.Controllers
             _forgetPasswordValidator = forgetPasswordValidator;
             _signInManager = signInManager;
         }
+
         [HttpPost("Login")]
         public async Task<ActionResult<Responses>> Login(LoginDTO userDto)
         {

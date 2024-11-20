@@ -116,7 +116,7 @@ namespace Airbnb.Application.Services
 			else
 			{
 
-				var roles = user.roles.Select(role => role.ToString()).ToList();
+				var roles = user.roles.Select(role => nameof(role)).ToList();
 				if (roles.Count() == 0)
 				{
 					await DocumentSettings.DeleteFile(SD.Image, SD.UserProfile, account.ProfileImage);
@@ -133,8 +133,14 @@ namespace Airbnb.Application.Services
 					return await Responses.FailurResponse(ex.Message, HttpStatusCode.InternalServerError);
 				}
 
-				var code = await _userManager.GenerateEmailConfirmationTokenAsync(account);
-				var message = $"please verify you email by this code {code}";
+				var Otp = await _userManager.GenerateEmailConfirmationTokenAsync(account);
+				var options = new MemoryCacheEntryOptions
+				{
+					AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+				};
+				_memoryCache.Set("Otp", Otp, options);
+
+				var message = $"please verify you email by this Otp: {Otp}";
 				await _mailService.SendEmailAsync(user.Email, "Email Confirmation", message);
 
 				await _mediator.Publish(new NotificationEvent()
@@ -143,7 +149,7 @@ namespace Airbnb.Application.Services
 					UserId = account.Id,
 					IsPublic = false
 				});
-				return await Responses.SuccessResponse(await _authService.CreateTokenAsync(account, _userManager), $"Please confirm your email address! code {code}");
+				return await Responses.SuccessResponse(await _authService.CreateTokenAsync(account, _userManager), $"Please confirm your email address! Otp {Otp}");
 			}
 		}
 
@@ -178,7 +184,7 @@ namespace Airbnb.Application.Services
 			}
 
 			var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-			var message = $"please verify you email by this code {code}";
+			var message = $"please verify you email by this Otp {code}";
 			await _mailService.SendEmailAsync(user.Email, "Email Confirmation", message);
 
 			if (oldImage != null)
@@ -203,7 +209,9 @@ namespace Airbnb.Application.Services
 			if (user == null) return await Responses.FailurResponse("invalid payloads", HttpStatusCode.NotFound);
 
 			var Isverified = await _userManager.ConfirmEmailAsync(user, code);
-			if (!Isverified.Succeeded) return await Responses.FailurResponse(Isverified.Errors, HttpStatusCode.InternalServerError);
+
+			var isValidOtp = _memoryCache.Get("Otp");
+			if (isValidOtp == null || (isValidOtp)!= code || !Isverified.Succeeded) return await Responses.FailurResponse(Isverified.Errors, HttpStatusCode.InternalServerError);
 
 			return await Responses.SuccessResponse("Email has been confirmed.");
 		}
@@ -241,7 +249,7 @@ namespace Airbnb.Application.Services
 					await _mediator.Publish(new NotificationEvent()
 					{
 						Message = "Successfully registration.",
-						UserId =admin.Id,
+						UserId = admin.Id,
 						IsPublic = false
 					});
 				}
@@ -303,20 +311,20 @@ namespace Airbnb.Application.Services
 		public async Task<Responses> RemoveUser(string userId)
 		{
 			var admin = await GetUser.GetCurrentUserAsync(_contextAccessor, _userManager);
-            if (admin==null)
-            {
+			if (admin == null)
+			{
 				return await Responses.FailurResponse("UnAuthorized", HttpStatusCode.Unauthorized);
-            }
+			}
 			var user = await _userManager.FindByIdAsync(userId);
-			if (user==null)
+			if (user == null)
 			{
 				return await Responses.FailurResponse("User is not found.", HttpStatusCode.NotFound);
 			}
-			
-            var spec = new BaseSpecifications<Property, string>(x => x.OwnerId == user.Id);
+
+			var spec = new BaseSpecifications<Property, string>(x => x.OwnerId == user.Id);
 			var properties = await _unitOfWork.Repository<Property, string>().GetAllWithSpecAsync(spec)!;
-			
-			_unitOfWork.Repository<Property,string>().RemoveRange(properties);
+
+			_unitOfWork.Repository<Property, string>().RemoveRange(properties);
 			await _userManager.DeleteAsync(user);
 
 			await _mediator.Publish(new NotificationEvent()
