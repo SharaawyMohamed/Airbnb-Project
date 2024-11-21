@@ -282,7 +282,7 @@ namespace Airbnb.Application.Services
 				return await Responses.FailurResponse("Email is not found!");
 			}
 
-			if (!_memoryCache.TryGetValue(user.Email, out string Otp))
+			if (!_memoryCache.TryGetValue(user.Email!, out string Otp))
 			{
 				return await Responses.FailurResponse("Time expired.... try again!", HttpStatusCode.BadRequest);
 			}
