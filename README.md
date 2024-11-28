@@ -32,7 +32,7 @@ Whether you’re a developer exploring modern .NET practices or a stakeholder lo
 - **Caching:** Redis for improved performance and scalability
 - **Authentication & Authorization:** ASP.NET Identity, JWT Tokens
 - **API Documentation:** Swagger
-- **Testing Framework:** xUnit with Moq
+- **Testing Framework:** xUnit with Moq, Bogus 
 - **Messaging Pattern:** MediatR for CQRS implementation
 - **Additional Tools:** AutoMapper, Mapster, FluentValidation, SendEmail, Dependency Injection
 
