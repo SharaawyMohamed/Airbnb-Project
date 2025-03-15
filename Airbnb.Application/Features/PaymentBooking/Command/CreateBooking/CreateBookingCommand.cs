@@ -113,7 +113,16 @@ namespace Airbnb.Application.Features.PaymentBooking.Command.CreateBooking
 
 				await _cache.SetStringAsync(request.Id, jsonData, options);
 
-				//TODO: SendNotification here 
+				var notification = new Notification()
+				{
+					CreatedAt = DateTime.Now,
+					IsRead = false,
+					UserId = user.Id,
+					Name = $"Property `{property.Name}` has been booked from `{request.StartDate}` to `{request.EndDate}` by `{user.FullName}`."
+				};
+				await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+				await _unitOfWork.CompleteAsync();
+					
 				return await Responses.SuccessResponse($"Property with id {property.Id} has been booked successfully!");
 			}
 			catch (Exception ex)

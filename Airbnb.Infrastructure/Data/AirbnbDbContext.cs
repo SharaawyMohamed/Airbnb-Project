@@ -120,5 +120,8 @@ namespace Airbnb.Infrastructure.Data
         public DbSet<Region> Regions { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<RoomService> roomServices { get; set; }
-    }
+        public DbSet<Notification> Notifications { get; set; }
+
+
+	}
 }

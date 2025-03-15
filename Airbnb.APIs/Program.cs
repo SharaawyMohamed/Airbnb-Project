@@ -27,6 +27,11 @@ namespace Airbnb.APIs
 			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
+				app.UseDeveloperExceptionPage();
+			}
+			else
+			{
+				app.UseHsts();
 			}
 
 			app.UseStaticFiles();

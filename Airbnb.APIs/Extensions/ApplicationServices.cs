@@ -14,8 +14,6 @@ using MediatR.NotificationPublishers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Crypto.Utilities;
-using StackExchange.Redis;
 namespace Airbnb.APIs.Extensions
 {
 	public static class ApplicationServices
@@ -98,6 +96,16 @@ namespace Airbnb.APIs.Extensions
 				{
 					fv.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
 				});
+			#endregion
+
+			#region Error Response
+			//Services.AddProblemDetails(options =>
+			//{
+			//	options.CustomizeProblemDetails = (context) =>
+			//	{
+			//		context.ProblemDetails.Extensions[""]
+			//	};
+			//})
 			#endregion
 
 			return Services;

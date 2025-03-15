@@ -48,6 +48,7 @@ namespace Airbnb.Application.Features.PaymentBooking.Command.RegisterBooking
 			}
 			var booking = JsonSerializer.Deserialize<CachedBooking>(jsonBooking);
 			var user = await GetUser.GetCurrentUserAsync(_contextAccessor, _userManager);
+
 			if (user == null || user.Id != booking.UserId)
 			{
 				return await Responses.FailurResponse("UnAuthorized!", HttpStatusCode.Unauthorized);
@@ -81,6 +82,17 @@ namespace Airbnb.Application.Features.PaymentBooking.Command.RegisterBooking
 				await _unitOfWork.CompleteAsync();
 
 				_cache.Remove(request.BookingId);
+
+				var notification = new Notification()
+				{
+					CreatedAt = DateTime.Now,
+					Name = $"Property `{paymentData.Property.Name}` booked from `{paymentData.StartDate}` to `{paymentData.EndDate}` successfully.",
+				    IsRead=false,
+					UserId = user.Id
+				};
+
+				await _unitOfWork.Repository<Notification,int>().AddAsync(notification);
+				await _unitOfWork.CompleteAsync();
 
 				return await Responses.SuccessResponse("Booking data has been registered successfully!");
 			}
