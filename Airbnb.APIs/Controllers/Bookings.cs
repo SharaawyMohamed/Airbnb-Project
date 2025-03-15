@@ -23,7 +23,7 @@ namespace Airbnb.APIs.Controllers
 		{
 			var query = new GetUserBookingsQuery(userId);
 			return Ok(await _mediator.Send(query));
-		}
+		}	 
 		[Authorize(Roles = "Customer")]
 		[HttpGet("GetBookingById")]
 		public async Task<ActionResult<Responses>> GetBookingById(int bookingId)

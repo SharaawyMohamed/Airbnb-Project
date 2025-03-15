@@ -2,7 +2,10 @@
 using Airbnb.Domain;
 using Airbnb.Domain.CachedObjects;
 using Airbnb.Domain.DataTransferObjects.User;
+using Airbnb.Domain.Entities;
 using Airbnb.Domain.Identity;
+using Airbnb.Domain.Interfaces.Repositories;
+using Airbnb.Infrastructure.Migrations;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,12 +39,14 @@ namespace Airbnb.Application.Features.PaymentBooking.Command.PayBooking
 		private readonly IDistributedCache _cache;
 		private readonly UserManager<AppUser> _userManager;
 		private readonly IHttpContextAccessor _contextAccessor;
-		public PayBookingCommandHandler(IConfiguration config, IDistributedCache cache, UserManager<AppUser> userManager, IHttpContextAccessor contextAccessor)
+		private readonly IUnitOfWork _unitOfWork;
+		public PayBookingCommandHandler(IConfiguration config, IDistributedCache cache, UserManager<AppUser> userManager, IHttpContextAccessor contextAccessor, IUnitOfWork unitOfWork)
 		{
 			_config = config;
 			_cache = cache;
 			_userManager = userManager;
 			_contextAccessor = contextAccessor;
+			_unitOfWork = unitOfWork;
 		}
 		public async Task<Responses> Handle(PayBookingCommand request, CancellationToken cancellationToken)
 		{
@@ -90,7 +96,18 @@ namespace Airbnb.Application.Features.PaymentBooking.Command.PayBooking
 
 
 			};
+			var notification = new Notification()
+			{
+				UserId = user.Id,
+				Name = $"Your booking with Id {request.BookingId} is successfully created!",
+				IsRead = false,
+				CreatedAt = DateTime.Now
+			};
+			await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+			await _unitOfWork.CompleteAsync();
+
 			return await Responses.SuccessResponse(paymentIntentBooking);
+
 		}
 	}
 }

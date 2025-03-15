@@ -198,6 +198,16 @@ namespace Airbnb.Application.Services
 				UserId = user.Id,
 				IsPublic = false
 			});
+
+			var notification = new Notification()
+			{
+				CreatedAt = DateTime.Now,
+				IsRead = false,
+				Name = "Profile updated successfully.",
+				UserId = user.Id
+			};
+			await _unitOfWork.Repository<Notification,int>().AddAsync(notification);
+			await _unitOfWork.CompleteAsync();
 			return await Responses.SuccessResponse("User updated successfully!.");
 
 		}
@@ -211,7 +221,16 @@ namespace Airbnb.Application.Services
 			var Isverified = await _userManager.ConfirmEmailAsync(user, code);
 
 			var isValidOtp = _memoryCache.Get("Otp");
-			if (isValidOtp == null || (isValidOtp)!= code || !Isverified.Succeeded) return await Responses.FailurResponse(Isverified.Errors, HttpStatusCode.InternalServerError);
+			if (isValidOtp == null || (isValidOtp) != code || !Isverified.Succeeded) return await Responses.FailurResponse(Isverified.Errors, HttpStatusCode.InternalServerError);
+			var notification = new Notification()
+			{
+				CreatedAt = DateTime.Now,
+				IsRead = false,
+			    Name = "Email has been confirmed.",
+				UserId = user.Id
+			};
+			await _unitOfWork.Repository<Notification,int>().AddAsync(notification);
+			await _unitOfWork.CompleteAsync();
 
 			return await Responses.SuccessResponse("Email has been confirmed.");
 		}
@@ -253,6 +272,16 @@ namespace Airbnb.Application.Services
 						IsPublic = false
 					});
 				}
+				var notification = new Notification()
+				{
+					Name = $"Admin `{admin.UserName}` add User Name `{user.UserName}`.",
+					UserId = user.Id,
+					IsRead = false,
+					CreatedAt = DateTime.Now
+				};
+				await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+				await _unitOfWork.CompleteAsync();
+
 				return await Responses.SuccessResponse(result, "User created successfully!.");
 			}
 		}
@@ -305,6 +334,16 @@ namespace Airbnb.Application.Services
 				IsPublic = false
 			});
 
+			var notification = new Notification()
+			{
+				Name = $"Password changed successfully.",
+				UserId = user.Id,
+				IsRead = false,
+				CreatedAt = DateTime.Now
+			};
+			await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+			await _unitOfWork.CompleteAsync();
+
 			return await Responses.SuccessResponse(user.Id, "Password updated successfully.");
 		}
 
@@ -333,6 +372,16 @@ namespace Airbnb.Application.Services
 				UserId = user.Id,
 				IsPublic = false
 			});
+			var notification = new Notification()
+			{
+				Name = $"User Name `{user.UserName}` has been deleted.",
+				UserId = user.Id,
+				IsRead = false,
+				CreatedAt = DateTime.Now
+			};
+			await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+			await _unitOfWork.CompleteAsync();
+
 			return await Responses.SuccessResponse(properties, "User Has Been Deleted Successfully.");
 		}
 	}

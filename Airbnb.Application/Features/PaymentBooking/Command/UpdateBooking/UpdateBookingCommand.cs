@@ -3,6 +3,7 @@ using Airbnb.Domain;
 using Airbnb.Domain.CachedObjects;
 using Airbnb.Domain.Entities;
 using Airbnb.Domain.Identity;
+using Airbnb.Domain.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -23,18 +24,21 @@ namespace Airbnb.Application.Features.PaymentBooking.Command.UpdateBooking
 		private readonly IHttpContextAccessor _contextAccessor;
 		private readonly UserManager<AppUser> _userManager;
 		private readonly IDistributedCache _cache;
+		private readonly IUnitOfWork _unitOfWork;
 		public UpdateBookingCommandHandler(IHttpContextAccessor contextAccessor,
 			UserManager<AppUser> userManager,
-			IDistributedCache cache)
+			IDistributedCache cache,
+			IUnitOfWork unitOfWork)
 		{
 			_contextAccessor = contextAccessor;
 			_userManager = userManager;
 			_cache = cache;
+			_unitOfWork = unitOfWork;
 		}
 
 		public async Task<Responses> Handle(UpdateBookingCommand request, CancellationToken cancellationToken)
 		{
-			var user = GetUser.GetCurrentUserAsync(_contextAccessor, _userManager);
+			var user =await GetUser.GetCurrentUserAsync(_contextAccessor, _userManager);
 			if (user == null) return await Responses.FailurResponse("UnAuthorized!", HttpStatusCode.Unauthorized);
 
 			var jsonData = await _cache.GetStringAsync(request.BookingId);
@@ -50,7 +54,16 @@ namespace Airbnb.Application.Features.PaymentBooking.Command.UpdateBooking
 				AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(2)
 			};
 			await _cache.SetStringAsync(request.BookingId, updated, options);
-			// TODO: Send Notification here for period 
+			var notifcation = new Notification
+			{
+				Name = $"Booking with Id `{request.BookingId}` has been updated!",
+				CreatedAt=DateTime.Now,
+				IsRead = false,
+				UserId=user.Id
+			};
+			await _unitOfWork.Repository<Notification, int>().AddAsync(notifcation);
+			await _unitOfWork.CompleteAsync();
+
 			return await Responses.SuccessResponse($"Booking with id {request.BookingId} updated successfully.");
 		}
 	}

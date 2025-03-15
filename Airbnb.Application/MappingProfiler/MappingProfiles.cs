@@ -1,4 +1,5 @@
-﻿using Airbnb.Application.Features.PaymentBooking.Query;
+﻿using Airbnb.Application.Features.Notifications.Query.CheckNewNotifications;
+using Airbnb.Application.Features.PaymentBooking.Query;
 using Airbnb.Application.Resolvers;
 using Airbnb.Domain.DataTransferObjects;
 using Airbnb.Domain.DataTransferObjects.Booking;
@@ -87,6 +88,7 @@ namespace Airbnb.Application.MappingProfiler
 			.ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.MiddlName} {src.LastName}".Trim()))
 			.ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password));
 
+			CreateMap<Notification, GetNewNotificationsQueryDto>();
 		}
 	}
 }

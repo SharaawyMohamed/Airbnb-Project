@@ -101,6 +101,23 @@ namespace Airbnb.Application.Services
 					IsPublic = false
 				});
 
+				var notification = new Notification()
+				{
+					Name = $"Review with `{Review.Id}` added successfully!",
+					UserId = user.Id,
+					IsRead = false,
+					CreatedAt = DateTime.Now
+				};
+				try
+				{
+					await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+					await _unitOfWork.CompleteAsync();
+
+				}catch(Exception ex)
+				{
+					var message = ex;
+				}
+
 				return await Responses.SuccessResponse("Commend added successfully!");
 			}
 			catch (Exception ex)
@@ -134,6 +151,17 @@ namespace Airbnb.Application.Services
 					UserId = user.Id,
 					IsPublic = false
 				});
+				var notification = new Notification()
+				{
+					Name = $"Review with Id `{review.Id}` has been deleted successfully!",
+					UserId = user.Id,
+					IsRead = false,
+					CreatedAt = DateTime.Now
+				};
+
+				await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+				await _unitOfWork.CompleteAsync();
+
 				return await Responses.SuccessResponse($"Review has been deleted successfully!");
 			}
 			catch (Exception ex)
@@ -163,9 +191,18 @@ namespace Airbnb.Application.Services
 				UserId = user.Id,
 				IsPublic = false
 			});
+
+			var notification = new Notification()
+			{
+				Name = $"Review`{review.ReviewId}` has been updated successfully!",
+				UserId = user.Id,
+				IsRead = false,
+				CreatedAt = DateTime.Now
+			};
+			await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+			await _unitOfWork.CompleteAsync();
 			return await Responses.SuccessResponse(review, "Review updated successfully.");
 		}
-
 	}
 
 }

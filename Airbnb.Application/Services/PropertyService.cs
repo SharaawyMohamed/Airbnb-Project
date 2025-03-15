@@ -136,7 +136,15 @@ namespace Airbnb.Application.Services
 					UserId = owner.Id,
 					IsPublic = false
 				});
-
+                var notification = new Notification()
+				{
+					Name = "New Property has been added!",
+					UserId = owner.Id,
+					IsRead = false,
+                    CreatedAt=DateTime.Now
+				};
+                await _unitOfWork.Repository<Notification, int>().AddAsync(notification);
+				await _unitOfWork.CompleteAsync();
 				return await Responses.SuccessResponse("Property has been created successfully!");
             }
             catch (Exception ex)
@@ -192,6 +200,16 @@ namespace Airbnb.Application.Services
 					UserId = property.OwnerId,
 					IsPublic = false
 				});
+                var notification = new Notification()
+                {
+                    UserId = user.Id,
+                    Name = "Your Property has been deleted!",
+                    IsRead = false,
+                    CreatedAt = DateTime.Now
+                };
+                await _unitOfWork.Repository<Notification,int>().AddAsync(notification);
+                await _unitOfWork.CompleteAsync();
+
 				return await Responses.SuccessResponse("Property has been deleted successfully!");
             }
             catch (Exception ex)
@@ -203,7 +221,7 @@ namespace Airbnb.Application.Services
         public async Task<Responses> GetAllPropertiesAsync()
         {
             // there is a cycle when return the object
-            var properties = await _unitOfWork.Repository<Property, string>().GetAllAsync();
+            var properties = await _unitOfWork.Repository<Property, string>().GetAllAsync()!;
 
             if (!properties.Any()) return await Responses.FailurResponse("There is no properties found", HttpStatusCode.NotFound);
 
@@ -268,6 +286,15 @@ namespace Airbnb.Application.Services
 					Message = "See new updates!",
 					IsPublic = true
 				});
+                var notification = new Notification()
+                {
+                    UserId = user.Id,
+                    Name = "Your Property has been updated!",
+                    IsRead = false,
+                    CreatedAt = DateTime.Now
+                };
+                await _unitOfWork.Repository<Notification,int>().AddAsync(notification);
+                await _unitOfWork.CompleteAsync();
 
 				return await Responses.SuccessResponse("Property has been updated successfully!");
             }
